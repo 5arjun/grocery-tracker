@@ -61,6 +61,10 @@ You never open a spreadsheet or run a command. Just talk to Claude:
 
 Then push, refresh the site, and the stats update.
 
+**Using another AI (e.g. a Perplexity Space)?** Paste the orientation prompt in
+[`SPACE_PROMPT.md`](SPACE_PROMPT.md) into the Space's custom instructions so every
+new chat knows the setup and reads `INSTRUCTIONS.md` first.
+
 ## One-time setup (GitHub Pages)
 
 Do this once so the live URL works:
