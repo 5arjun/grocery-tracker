@@ -1,0 +1,242 @@
+/* ------------------------------------------------------------------
+   Grocery Tracker — design tokens (from the dataviz reference palette)
+   Light + dark are both selected: dark is its own validated step set,
+   not an automatic flip.
+------------------------------------------------------------------ */
+.viz-root {
+  /* surfaces & planes */
+  --page:            #f9f9f7;
+  --surface-1:       #fcfcfb;   /* card / chart surface */
+  /* ink */
+  --text-primary:    #0b0b0b;
+  --text-secondary:  #52514e;
+  --text-muted:      #898781;
+  /* chrome */
+  --gridline:        #e1e0d9;
+  --baseline:        #c3c2b7;
+  --border:          rgba(11, 11, 11, 0.10);
+  /* categorical / status slots used by the charts */
+  --series-1:        #2a78d6;   /* blue  — primary spend hue */
+  --series-2:        #1baf7a;   /* aqua  — secondary */
+  --status-critical: #d03b3b;   /* waste */
+  --good:            #006300;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  .viz-root {
+    --page:           #0d0d0d;
+    --surface-1:      #1a1a19;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255, 255, 255, 0.10);
+    --series-1:       #3987e5;
+    --series-2:       #199e70;
+    --status-critical:#d03b3b;
+    --good:           #0ca30c;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 32px);
+}
+
+/* --- header / footer ------------------------------------------------ */
+.site-header {
+  padding-block: 28px 8px;
+}
+.site-header h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: -0.01em;
+}
+.updated {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.site-footer {
+  margin-top: 48px;
+  padding-block: 24px 40px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.site-footer code,
+.site-footer p { margin: 0; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* --- KPI tiles ------------------------------------------------------ */
+.kpis {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-top: 20px;
+}
+.tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 96px;
+}
+.tile--hero {
+  grid-column: span 2;
+}
+.tile__label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.tile__value {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.tile--hero .tile__value {
+  font-size: clamp(2rem, 7vw, 3rem);
+}
+.tile__sub {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  min-height: 1em;
+}
+
+@media (max-width: 460px) {
+  .tile--hero { grid-column: span 2; }
+}
+
+/* --- cards / grids -------------------------------------------------- */
+.charts,
+.tables {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+}
+.charts { grid-template-columns: repeat(2, 1fr); }
+.tables { grid-template-columns: repeat(2, 1fr); }
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px 20px;
+  min-width: 0; /* let charts shrink inside grid tracks */
+}
+.card--wide { grid-column: 1 / -1; }
+
+.card__head { margin-bottom: 12px; }
+.card__head h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.card__sub {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+.card__body { position: relative; }
+
+/* chart canvases get an explicit box so the x-axis band is never clipped */
+.chart-box {
+  position: relative;
+  height: 260px;
+}
+.chart-box--short { height: 150px; }
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 32px 8px;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .charts,
+  .tables { grid-template-columns: 1fr; }
+}
+
+/* --- tables --------------------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+thead th {
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--gridline);
+  vertical-align: top;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.num, th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.table-scroll { overflow-x: auto; }
+
+/* status pill for inventory */
+.pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.pill--open   { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, transparent); }
+.pill--depleted,
+.pill--wasted { color: var(--text-muted); }
+
+/* legend key dots reused in tables/labels */
+.key {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: baseline;
+}

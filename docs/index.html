@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Grocery Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Data & charting libraries load from CDNs (needs internet to view). -->
+  <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body class="viz-root">
+  <header class="site-header">
+    <div class="wrap">
+      <h1>🛒 Grocery Tracker</h1>
+      <p class="updated" id="last-updated" hidden></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- KPI tiles -->
+    <section class="kpis" aria-label="Key stats">
+      <div class="tile tile--hero">
+        <span class="tile__label">Total spent</span>
+        <span class="tile__value" id="kpi-total-spent">—</span>
+        <span class="tile__sub" id="kpi-total-spent-sub"></span>
+      </div>
+      <div class="tile">
+        <span class="tile__label">Avg cost / meal</span>
+        <span class="tile__value" id="kpi-avg-meal">—</span>
+      </div>
+      <div class="tile">
+        <span class="tile__label">Waste</span>
+        <span class="tile__value" id="kpi-waste-pct">—</span>
+        <span class="tile__sub" id="kpi-waste-sub"></span>
+      </div>
+      <div class="tile">
+        <span class="tile__label">Grocery trips</span>
+        <span class="tile__value" id="kpi-trips">—</span>
+        <span class="tile__sub" id="kpi-trips-sub"></span>
+      </div>
+      <div class="tile">
+        <span class="tile__label">Meals logged</span>
+        <span class="tile__value" id="kpi-meals">—</span>
+        <span class="tile__sub" id="kpi-meals-sub"></span>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="charts" aria-label="Charts">
+      <div class="card">
+        <div class="card__head">
+          <h2>Spend over time</h2>
+          <p class="card__sub">Total grocery spend per day</p>
+        </div>
+        <div class="card__body">
+          <div class="chart-box"><canvas id="chart-spend"></canvas></div>
+          <p class="empty" id="empty-spend" hidden>No purchases logged yet.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head">
+          <h2>Avg cost by meal type</h2>
+          <p class="card__sub">Average estimated cost per meal</p>
+        </div>
+        <div class="card__body">
+          <div class="chart-box"><canvas id="chart-mealtype"></canvas></div>
+          <p class="empty" id="empty-mealtype" hidden>No meals logged yet.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head">
+          <h2>Top items by cost</h2>
+          <p class="card__sub">Highest total spend across all trips</p>
+        </div>
+        <div class="card__body">
+          <div class="chart-box"><canvas id="chart-topitems"></canvas></div>
+          <p class="empty" id="empty-topitems" hidden>No purchases logged yet.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head">
+          <h2>Waste vs. spend</h2>
+          <p class="card__sub">Wasted value as a share of total spend</p>
+        </div>
+        <div class="card__body">
+          <div class="chart-box chart-box--short"><canvas id="chart-waste"></canvas></div>
+          <p class="empty" id="empty-waste" hidden>No spend logged yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tables -->
+    <section class="tables" aria-label="Data tables">
+      <div class="card">
+        <div class="card__head"><h2>Top items by frequency</h2>
+          <p class="card__sub">Items appearing in the most meals</p></div>
+        <div class="card__body" id="table-topfreq"></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><h2>Current inventory</h2>
+          <p class="card__sub">Open batches and remaining quantity</p></div>
+        <div class="card__body" id="table-inventory"></div>
+      </div>
+      <div class="card card--wide">
+        <div class="card__head"><h2>Recent purchases</h2></div>
+        <div class="card__body" id="table-purchases"></div>
+      </div>
+      <div class="card card--wide">
+        <div class="card__head"><h2>Recent meals</h2></div>
+        <div class="card__body" id="table-meals"></div>
+      </div>
+      <div class="card card--wide">
+        <div class="card__head"><h2>Waste log</h2></div>
+        <div class="card__body" id="table-waste"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Data lives in <code>docs/data/*.csv</code> — edit those files and this page updates.</p>
+    </div>
+  </footer>
+</body>
+</html>
