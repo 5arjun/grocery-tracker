@@ -1,7 +1,7 @@
 batch_id,item,date_purchased,store,qty_purchased,unit,unit_cost,qty_remaining,status,notes
-B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.10,OPEN,Publix 14oz
+B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.70,OPEN,Publix 14oz
 B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,0.67,OPEN,Publix 16oz
-B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0,DEPLETED,Perdue
+B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0.25,OPEN,Perdue
 B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,0.70,OPEN,Fairlife
 B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,0.85,OPEN,Publix
 B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,0.40,OPEN,Publix 16oz
@@ -12,7 +12,7 @@ B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.70,OPEN,
 B011,Burrito Tortillas,2026-07-12,Publix,8,ct,0.42,7,OPEN,La Banderita 10 inch
 B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,4,OPEN,Thomas
 B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,0.40,OPEN,
-B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.48,OPEN,
+B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.13,OPEN,
 B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,0.34,OPEN,Ragu
 B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,1.51,OPEN,
 B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.50,OPEN,La Fe

@@ -67,6 +67,17 @@ Usage is **inferred from meal descriptions**, not from exact portion sizes. The
 user reports meals by description only (e.g., "3 eggs with cheese," "chicken rice
 bowl"). Never require exact weights or volumes.
 
+**Inference reduces the estimated quantity only — it NEVER closes a batch.** A
+batch stays `OPEN` no matter how low `qty_remaining` gets from inferred meal
+usage, even if the estimate reaches or dips below 0 (that just means the portion
+estimates were off). A batch becomes `DEPLETED` or `WASTED` **only** when the user
+explicitly says so ("finished the chicken," "ran out of rice") or reports a waste
+event. The user will always try to tell you when something runs out — so when in
+doubt, keep it `OPEN`. If inferred usage drives `qty_remaining` at or below 0 on a
+still-`OPEN` batch, leave it `OPEN`, keep the value (0 or negative is fine as an
+estimate), and you may briefly note that the portion estimates for that item look
+high.
+
 ### 2. FIFO Batch Logic
 Each grocery trip creates a new **batch** per item (a new row in
 `purchases.csv` and `inventory.csv`). The oldest `OPEN` batch for an item is
@@ -101,9 +112,10 @@ lightweight — no separate reconciliation ledger:
 - When such an item is used in a meal, set `fuzzy = yes` on its `meal_usage.csv` row.
 - In `inventory.csv`, you may mark the batch `status = FUZZY` while its remaining
   quantity is approximate.
-- The meal's `est_cost` stays provisional. When the batch is confirmed depleted,
-  you may revise the affected meals' `est_cost` to spread the batch cost across
-  them, and set the batch `status = DEPLETED`.
+- The meal's `est_cost` stays provisional. When the user says the batch is
+  finished, you may revise the affected meals' `est_cost` to spread the batch cost
+  across them, and set the batch `status = DEPLETED`. (Per Rule 1, only the user's
+  say-so closes a batch — never inferred usage.)
 - A batch is confirmed depleted when the user says so ("finished the block of
   cheese"), **or** it's been absent from receipts and recent meals long enough
   that you're confident — in which case **flag it to the user for confirmation**
@@ -143,10 +155,11 @@ Only after this checklist should you process any new receipt, meal, or waste rep
 1. Assign the next `meal_id` and append a row to `meals.csv` (meal_type,
    verbatim description, `est_cost`, optional notes).
 2. For each item in the meal, append a row to `meal_usage.csv`:
-   - Pick the batch to deplete (FIFO default, or the overridden batch).
+   - Pick the batch to draw from (FIFO default, or the overridden batch).
    - Set `inferred_qty`, `unit`, and `fuzzy` (`yes` for fuzzy items).
-   - Reduce that batch's `qty_remaining` in `inventory.csv`; set `status =
-     DEPLETED` if it reaches 0.
+   - Reduce that batch's `qty_remaining` in `inventory.csv`. **Leave `status`
+     as `OPEN`** — do NOT set `DEPLETED`, even if `qty_remaining` reaches or
+     goes below 0 (see Rule 1). Only the user's explicit "ran out" closes a batch.
 3. State your depletion assumptions explicitly to the user.
 
 ### C. When Waste is Reported
