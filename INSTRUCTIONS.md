@@ -106,9 +106,16 @@ Waste is **never inferred**. Only log waste when the user directly states it
 - Reduce `qty_remaining` in `inventory.csv`; set `status` to `WASTED` if it hits 0
 
 ### 5. Fuzzy Item Reconciliation (simplified for v1)
-Fuzzy items (cheese, rice, oil, hot sauce, butter, condiments, spices, etc.) have
-costs that **cannot be finalized per meal immediately**. For v1 we keep this
-lightweight — no separate reconciliation ledger:
+**Fuzzy is the default.** Treat an item as fuzzy unless it is sold as a discrete
+labeled count with an exact per-unit price you can read off the receipt — e.g.
+eggs (18 ct), bagels (6 ct), tortillas (8 ct), a 24-pack of cookies. Everything
+else is fuzzy: anything sold by weight (apples, loose produce), anything in a
+container consumed a little at a time (cheese, rice, sauces, oil, butter, milk,
+cottage cheese, peanut butter, ice cream), bagged produce with no labeled count
+(a 3 lb bag of mandarins, baby carrots, salad), and small-amount produce like
+peppers and onions. Rule of thumb: **if you can't tell exactly how much of the
+batch went into a given meal, it's fuzzy.** For v1 we keep this lightweight — no
+separate reconciliation ledger:
 - When such an item is used in a meal, set `fuzzy = yes` on its `meal_usage.csv` row.
 - In `inventory.csv`, you may mark the batch `status = FUZZY` while its remaining
   quantity is approximate.
@@ -166,9 +173,17 @@ Only after this checklist should you process any new receipt, meal, or waste rep
 Follow **Core Rule 4** above: append to `waste.csv`, update `inventory.csv`.
 
 ### D. When Fuzzy Reconciliation is Triggered
-Follow **Core Rule 5** above: revise affected `meals.csv` `est_cost` values and
-set the batch `status = DEPLETED`. Flag absence-based reconciliation to the user
-first.
+When the user says a fuzzy batch is finished (e.g., "used up the red onions"):
+1. Find every `meal_usage.csv` row for that `batch_id`.
+2. Split the batch's **total cost** (use the exact `total_price` from
+   `purchases.csv`, not `unit_cost × qty`, to avoid rounding drift) across those
+   meals — proportional to `inferred_qty` if portions were noted, otherwise evenly.
+3. In each affected meal, replace that item's provisional contribution with its
+   reconciled share and update the meal's `est_cost` in `meals.csv`.
+4. Set the batch `status = DEPLETED` and `qty_remaining = 0` in `inventory.csv`.
+Only the user's say-so triggers this (or absence-based, flagged for confirmation
+first). This is why per-meal costs on fuzzy produce/condiments are provisional
+until the container is done.
 
 ---
 
