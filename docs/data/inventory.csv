@@ -1,22 +1,25 @@
 batch_id,item,date_purchased,store,qty_purchased,unit,unit_cost,qty_remaining,status,notes
-B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,1,OPEN,
-B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,1,OPEN,
-B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,1,OPEN,Perdue
-B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,1,OPEN,Fairlife
-B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,1,OPEN,
-B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,1,OPEN,
-B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,1,OPEN,
-B008,Mandarins,2026-07-12,Publix,1,bag,6.99,1,OPEN,
-B009,American Salad,2026-07-12,Publix,1,bag,4.15,1,OPEN,
-B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,1,OPEN,
-B011,Burrito Tortillas 8ct,2026-07-12,Publix,1,pkg,3.39,1,OPEN,La Banderita 10 inch
-B012,Plain Bagels,2026-07-12,Publix,1,pkg,5.49,1,OPEN,Thomas
-B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,1.10,OPEN,
-B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.88,OPEN,
-B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,1,OPEN,Ragu
-B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,2.17,OPEN,
-B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,1,OPEN,La Fe
-B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,1,FUZZY,Tropical - fuzzy item
-B019,XL White Eggs,2026-07-12,Presidente Supermarket,1,dozen,3.99,12,OPEN,Sunup - 12 eggs
-B020,Basmati Rice,2026-07-12,Amazon,1,bag,3.97,1,FUZZY,Mahatma 32oz - fuzzy item
+B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.10,OPEN,Publix 14oz
+B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,0.67,OPEN,Publix 16oz
+B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0,DEPLETED,Perdue
+B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,0.70,OPEN,Fairlife
+B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,0.85,OPEN,Publix
+B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,0.40,OPEN,Publix 16oz
+B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,0.60,OPEN,Publix
+B008,Mandarins,2026-07-12,Publix,18,ct,0.39,15,OPEN,3lb bag ~18ct
+B009,American Salad,2026-07-12,Publix,1,bag,4.15,1,OPEN,Publix
+B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.70,OPEN,
+B011,Burrito Tortillas,2026-07-12,Publix,8,ct,0.42,7,OPEN,La Banderita 10 inch
+B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,4,OPEN,Thomas
+B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,0.40,OPEN,
+B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.48,OPEN,
+B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,0.34,OPEN,Ragu
+B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,1.51,OPEN,
+B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.50,OPEN,La Fe
+B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,0.70,FUZZY,Tropical - fuzzy item
+B019,XL White Eggs,2026-07-12,Presidente Supermarket,18,ct,0.22,11,OPEN,Sunup - 18ct
+B020,Basmati Rice,2026-07-12,Amazon,1,bag,3.97,0.85,FUZZY,Mahatma 32oz - fuzzy item
 B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,2,FUZZY,Skippy 26.5oz Pack of 2 - fuzzy item
+B022,Mint Choc Chip Ice Cream,2026-07-13,Publix,1,tub,6.19,0.85,OPEN,
+B023,Cereal,2026-07-13,Publix,1,box,2.78,1,OPEN,
+B024,Cookies,2026-07-13,Publix,24,ct,0.25,22,OPEN,24 pack

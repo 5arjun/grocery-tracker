@@ -6,17 +6,20 @@ T001,B004,2026-07-12,Publix,Milk Fat Free,Fairlife,1,bottle,5.46,5.46
 T001,B005,2026-07-12,Publix,Whipped Cream Cheese,Publix,1,tub,3.49,3.49
 T001,B006,2026-07-12,Publix,Cottage Cheese Lowfat Pineapple,Publix 16oz,1,tub,2.93,2.93
 T001,B007,2026-07-12,Publix,Baby Cut Carrots,Publix,1,bag,3.79,3.79
-T001,B008,2026-07-12,Publix,Mandarins,,1,bag,6.99,6.99
+T001,B008,2026-07-12,Publix,Mandarins,3lb bag ~18ct,18,ct,6.99,0.39
 T001,B009,2026-07-12,Publix,American Salad,Publix,1,bag,4.15,4.15
 T001,B010,2026-07-12,Publix,Garlic Blend,,1,pkg,5.15,5.15
-T001,B011,2026-07-12,Publix,Burrito Tortillas 8ct,La Banderita 10 inch,1,pkg,3.39,3.39
-T001,B012,2026-07-12,Publix,Plain Bagels,Thomas,1,pkg,5.49,5.49
+T001,B011,2026-07-12,Publix,Burrito Tortillas,La Banderita 10 inch 8ct,8,ct,3.39,0.42
+T001,B012,2026-07-12,Publix,Plain Bagels,Thomas 6ct,6,ct,5.49,0.92
 T001,B013,2026-07-12,Publix,Red Onions,,1.10,lb,3.38,3.07
 T001,B014,2026-07-12,Publix,Red Bell Peppers,,0.88,lb,2.63,2.99
 T002,B015,2026-07-12,Presidente Supermarket,Robusto 6 Cheese Pasta Sauce,Ragu,1,jar,4.69,4.69
 T002,B016,2026-07-12,Presidente Supermarket,Red Delicious Apples,,2.17,lb,4.32,1.99
 T002,B017,2026-07-12,Presidente Supermarket,Rigatoni Pasta,La Fe,1,box,2.29,2.29
 T002,B018,2026-07-12,Presidente Supermarket,Shredded Mexican Cheese,Tropical,1,bag,2.99,2.99
-T002,B019,2026-07-12,Presidente Supermarket,XL White Eggs,Sunup,1,dozen,3.99,3.99
+T002,B019,2026-07-12,Presidente Supermarket,XL White Eggs,Sunup,18,ct,3.99,0.22
 T003,B020,2026-07-12,Amazon,Basmati Rice,Mahatma 32oz,1,bag,3.97,3.97
 T003,B021,2026-07-12,Amazon,Natural Creamy Peanut Butter,Skippy 26.5oz Pack of 2,2,jar,7.48,3.74
+T004,B022,2026-07-13,Publix,Mint Choc Chip Ice Cream,,1,tub,6.19,6.19
+T004,B023,2026-07-13,Publix,Cereal,,1,box,2.78,2.78
+T004,B024,2026-07-13,Publix,Cookies,24 pack,24,ct,6.00,0.25
