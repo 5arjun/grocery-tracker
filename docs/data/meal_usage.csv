@@ -5,15 +5,15 @@ M0002,B017,Rigatoni Pasta,0.25,box,yes,
 M0002,B003,Boneless Chicken Breast,0.25,pkg,yes,
 M0002,B010,Garlic Blend,0.15,pkg,yes,garlic paste
 M0002,B013,Red Onions,0.15,lb,yes,
-M0002,B014,Red Bell Peppers,0.15,lb,yes,green pepper = red bell
+M0002,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0002,B015,Robusto 6 Cheese Pasta Sauce,0.33,jar,yes,
 M0003,B004,Milk Fat Free,0.15,bottle,yes,
 M0004,B019,XL White Eggs,2,ct,no,
 M0004,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,
 M0004,B013,Red Onions,0.1,lb,yes,
-M0004,B014,Red Bell Peppers,0.15,lb,yes,green pepper = red bell
+M0004,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0005,B012,Plain Bagels,1,ct,no,1 of pkg
-M0005,B014,Red Bell Peppers,0.15,lb,yes,green pepper = red bell
+M0005,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0005,B013,Red Onions,0.1,lb,yes,
 M0005,B018,Shredded Mexican Cheese,0.1,bag,yes,fuzzy cheese
 M0005,B002,Sliced Rotisserie Chicken,0.33,pkg,yes,chicken slices
@@ -30,7 +30,7 @@ M0007,B007,Baby Cut Carrots,0.2,bag,yes,
 M0007,B004,Milk Fat Free,0.15,bottle,yes,
 M0008,B019,XL White Eggs,3,ct,no,
 M0008,B013,Red Onions,0.1,lb,yes,
-M0008,B014,Red Bell Peppers,0.15,lb,yes,green pepper = red bell
+M0008,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0008,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,
 M0009,B012,Plain Bagels,1,ct,no,1 of pkg
 M0009,B005,Whipped Cream Cheese,0.15,tub,yes,
@@ -39,7 +39,7 @@ M0010,B015,Robusto 6 Cheese Pasta Sauce,0.33,jar,yes,
 M0010,B003,Boneless Chicken Breast,0.25,pkg,yes,
 M0010,B010,Garlic Blend,0.15,pkg,yes,garlic paste
 M0010,B013,Red Onions,0.15,lb,yes,
-M0010,B014,Red Bell Peppers,0.15,lb,yes,green pepper = red bell
+M0010,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0011,B007,Baby Cut Carrots,0.2,bag,yes,
 M0011,B008,Mandarins,1,ct,yes,
 M0011,B016,Red Delicious Apples,0.33,lb,yes,1 apple
@@ -48,7 +48,7 @@ M0011,B024,Cookies,2,ct,no,
 M0012,B019,XL White Eggs,3,ct,no,
 M0012,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,
 M0012,B013,Red Onions,0.1,lb,yes,
-M0012,B014,Red Bell Peppers,0.13,lb,yes,
+M0012,B014,Red Bell Peppers,0.093,lb,yes,
 M0012,B002,Sliced Rotisserie Chicken,0.2,pkg,yes,
 M0013,B007,Baby Cut Carrots,0.2,bag,yes,
 M0013,B008,Mandarins,2,ct,yes,
@@ -56,7 +56,7 @@ M0013,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
 M0014,B012,Plain Bagels,1,ct,no,
 M0014,B002,Sliced Rotisserie Chicken,0.25,pkg,yes,
 M0014,B013,Red Onions,0.1,lb,yes,
-M0014,B014,Red Bell Peppers,0.1,lb,yes,
+M0014,B014,Red Bell Peppers,0.071,lb,yes,
 M0014,B018,Shredded Mexican Cheese,0.1,bag,yes,
 M0014,B009,American Salad,0.4,bag,yes,
 M0015,B004,Milk Fat Free,0.15,bottle,yes,
