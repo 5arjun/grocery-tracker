@@ -10,7 +10,7 @@ This repo is the persistent source of truth for a grocery and meal tracking
 system. Any new AI chat session can pick up exactly where the last one left off —
 no lost context between receipts and meal logs.
 
-The source of truth is **five CSV files under `docs/data/`**. A static website
+The source of truth is **six CSV files under `docs/data/`**. A static website
 (`docs/index.html` + `style.css` + `app.js`) reads those CSVs directly in the
 browser and computes every stat live. **There is no script and no build step** —
 when you edit the CSVs and push, the live site updates on the next reload.
@@ -57,6 +57,15 @@ comma, wrap that field in double quotes (standard CSV).
 `batch_id,item,date_purchased,store,qty_purchased,unit,unit_cost,qty_remaining,status,notes`
 - `status` — `OPEN` | `DEPLETED` | `WASTED` | `FUZZY`
 - `qty_remaining` — reduce as meals/waste deplete the batch
+
+### `outside_food.csv` — restaurant / delivery / happy-hour spending
+`date,description,cost,notes`
+- Anything eaten out or ordered from a restaurant (happy hour, fast food, ice
+  cream shop, etc.) — money spent on food that never enters the grocery
+  inventory. Kept **separate** from `meals.csv` on purpose so restaurant prices
+  don't skew `avg_cost_per_meal` / `avg_cost_breakfast`/etc., which are meant to
+  reflect home-cooked cost-per-meal from tracked groceries.
+- Not linked to any `batch_id` or `meal_id` — just append a row per event.
 
 ---
 
@@ -142,6 +151,7 @@ Run through this every session, in order:
 - [ ] **3. Read `docs/data/meals.csv`** — what was last consumed, and the last `meal_id` used
 - [ ] **4. Read `docs/data/meal_usage.csv`** — note any rows with `fuzzy = yes` still pending
 - [ ] **5. Read `docs/data/waste.csv`** — any recent waste events
+- [ ] **6. Read `docs/data/outside_food.csv`** — recent restaurant/delivery spending
 
 Only after this checklist should you process any new receipt, meal, or waste report.
 

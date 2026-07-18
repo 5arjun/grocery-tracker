@@ -16,7 +16,7 @@ M0005,B012,Plain Bagels,1,ct,no,1 of pkg
 M0005,B014,Red Bell Peppers,0.107,lb,yes,green pepper = red bell
 M0005,B013,Red Onions,0.1,lb,yes,
 M0005,B018,Shredded Mexican Cheese,0.1,bag,yes,fuzzy cheese
-M0005,B002,Sliced Rotisserie Chicken,0.33,pkg,yes,chicken slices
+M0005,B002,Sliced Rotisserie Chicken,0.17,pkg,yes,chicken slices - scaled down 2026-07-18 (see B002 note)
 M0006,B011,Burrito Tortillas,1,ct,no,
 M0006,B003,Boneless Chicken Breast,0.25,pkg,yes,
 M0006,B001,Pepper Trio,0.3,pkg,yes,frozen peppers = pepper trio
@@ -49,15 +49,56 @@ M0012,B019,XL White Eggs,3,ct,no,
 M0012,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,
 M0012,B013,Red Onions,0.1,lb,yes,
 M0012,B014,Red Bell Peppers,0.093,lb,yes,
-M0012,B002,Sliced Rotisserie Chicken,0.2,pkg,yes,
+M0012,B002,Sliced Rotisserie Chicken,0.10,pkg,yes,scaled down 2026-07-18 (see B002 note)
 M0013,B007,Baby Cut Carrots,0.2,bag,yes,
 M0013,B008,Mandarins,2,ct,yes,
 M0013,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
 M0014,B012,Plain Bagels,1,ct,no,
-M0014,B002,Sliced Rotisserie Chicken,0.25,pkg,yes,
+M0014,B002,Sliced Rotisserie Chicken,0.13,pkg,yes,scaled down 2026-07-18 (see B002 note)
 M0014,B013,Red Onions,0.1,lb,yes,
 M0014,B014,Red Bell Peppers,0.071,lb,yes,
 M0014,B018,Shredded Mexican Cheese,0.1,bag,yes,
 M0014,B009,American Salad,0.4,bag,yes,
 M0015,B004,Milk Fat Free,0.15,bottle,yes,
 M0015,B023,Cereal,0.25,box,yes,
+M0016,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0016,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0017,B019,XL White Eggs,3,ct,no,
+M0017,B013,Red Onions,0.05,lb,yes,
+M0017,B014,Red Bell Peppers,0.08,lb,yes,
+M0017,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,
+M0018,B011,Burrito Tortillas,1,ct,no,
+M0018,B001,Pepper Trio,0.15,pkg,yes,frozen veggies = pepper trio
+M0018,B013,Red Onions,0.05,lb,yes,
+M0018,B003,Boneless Chicken Breast,0.25,pkg,yes,
+M0018,B018,Shredded Mexican Cheese,0.1,bag,yes,
+M0018,B006,Cottage Cheese Lowfat Pineapple,0.15,tub,yes,used twice today - see inventory note
+M0018,B020,Basmati Rice,0.15,bag,yes,
+M0019,B007,Baby Cut Carrots,0.2,bag,yes,
+M0019,B008,Mandarins,1,ct,yes,
+M0019,B024,Cookies,2,ct,no,
+M0019,B004,Milk Fat Free,0.15,bottle,yes,
+M0019,B025,Oreo Sandwich Cookies,0.25,bag,yes,
+M0020,B026,Banana,1,ct,yes,
+M0020,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0021,B012,Plain Bagels,1,ct,no,
+M0021,B005,Whipped Cream Cheese,0.15,tub,yes,
+M0021,B024,Cookies,1,ct,no,
+M0021,B007,Baby Cut Carrots,0.15,bag,yes,
+M0022,B017,Rigatoni Pasta,0.25,box,yes,
+M0022,B015,Robusto 6 Cheese Pasta Sauce,0.33,jar,yes,
+M0022,B010,Garlic Blend,0.15,pkg,yes,garlic paste
+M0022,B003,Boneless Chicken Breast,0.25,pkg,yes,
+M0022,B013,Red Onions,0.05,lb,yes,
+M0022,B001,Pepper Trio,0.15,pkg,yes,frozen peppers = pepper trio
+M0023,B008,Mandarins,2,ct,yes,
+M0023,B025,Oreo Sandwich Cookies,0.25,bag,yes,
+M0023,B004,Milk Fat Free,0.15,bottle,yes,
+M0024,B011,Burrito Tortillas,1,ct,no,
+M0024,B019,XL White Eggs,3,ct,no,user confirmed batch finished - see inventory note (2ct discrepancy flagged)
+M0024,B029,Organic Baby Spinach,0.3,bag,yes,
+M0024,B013,Red Onions,0.05,lb,yes,
+M0024,B014,Red Bell Peppers,0.08,lb,yes,
+M0024,B002,Sliced Rotisserie Chicken,0.1,pkg,yes,user reports ~half (0.5 pkg) remains after this meal - see inventory note
+M0025,B026,Banana,1,ct,yes,
+M0025,B007,Baby Cut Carrots,0.05,bag,yes,

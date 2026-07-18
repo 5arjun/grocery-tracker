@@ -1,25 +1,35 @@
 batch_id,item,date_purchased,store,qty_purchased,unit,unit_cost,qty_remaining,status,notes
-B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.70,FUZZY,Publix 14oz
-B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,0.22,FUZZY,Publix 16oz
-B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0.25,FUZZY,Perdue
-B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,0.55,FUZZY,Fairlife
+B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.40,FUZZY,Publix 14oz
+B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,0.50,FUZZY,"Publix 16oz; qty_remaining reset to 0.5 pkg per user's 2026-07-18 report ('half left') - prior estimate was too high, historical meal_usage scaled down accordingly"
+B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0,DEPLETED,Perdue; user confirmed finished 2026-07-18
+B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,0.25,FUZZY,Fairlife
 B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,0.85,FUZZY,Publix
-B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,0.20,FUZZY,Publix 16oz
-B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,0.40,FUZZY,Publix
-B008,Mandarins,2026-07-12,Publix,18,ct,0.39,13,FUZZY,3lb bag ~18ct
+B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,-0.15,FUZZY,"Publix 16oz; used twice on 2026-07-16 (lunch+dinner), estimate ran negative - likely near/at empty, flagged for user confirmation"
+B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,0.00,FUZZY,"Publix; estimate hit exactly 0 as of 2026-07-18 - flagged for user confirmation"
+B008,Mandarins,2026-07-12,Publix,18,ct,0.39,10,FUZZY,3lb bag ~18ct
 B009,American Salad,2026-07-12,Publix,1,bag,4.15,0.60,FUZZY,Publix
-B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.70,FUZZY,
-B011,Burrito Tortillas,2026-07-12,Publix,8,ct,0.42,7,OPEN,La Banderita 10 inch
-B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,3,OPEN,Thomas
-B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,0.20,FUZZY,
-B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.18,FUZZY,
-B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,0.34,FUZZY,Ragu
-B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,1.51,FUZZY,
-B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.50,FUZZY,La Fe
-B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,0.60,FUZZY,Tropical - fuzzy item
-B019,XL White Eggs,2026-07-12,Presidente Supermarket,18,ct,0.22,8,OPEN,Sunup - 18ct
-B020,Basmati Rice,2026-07-12,Amazon,1,bag,3.97,0.85,FUZZY,Mahatma 32oz - fuzzy item
-B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,1.90,FUZZY,Skippy 26.5oz Pack of 2 - fuzzy item
+B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.55,FUZZY,
+B011,Burrito Tortillas,2026-07-12,Publix,8,ct,0.42,5,OPEN,La Banderita 10 inch
+B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,2,OPEN,Thomas
+B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,0.00,FUZZY,estimate hit exactly 0 as of 2026-07-18 - flagged for user confirmation
+B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0.02,FUZZY,
+B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,0.01,FUZZY,"Ragu - nearly empty, flagged for user confirmation"
+B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,1.18,FUZZY,
+B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.25,FUZZY,La Fe
+B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,0.50,FUZZY,Tropical - fuzzy item
+B019,XL White Eggs,2026-07-12,Presidente Supermarket,18,ct,0.22,0,DEPLETED,"Sunup - 18ct; user confirmed finished 2026-07-18 breakfast (M0024). FIFO estimate said ~2ct should have remained - discrepancy flagged, possibly an uncounted use or miscount"
+B020,Basmati Rice,2026-07-12,Amazon,1,bag,3.97,0.70,FUZZY,Mahatma 32oz - fuzzy item
+B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,1.70,FUZZY,Skippy 26.5oz Pack of 2 - fuzzy item
 B022,Mint Choc Chip Ice Cream,2026-07-13,Publix,1,tub,6.19,0.85,FUZZY,
 B023,Cereal,2026-07-13,Publix,1,box,2.78,0.75,FUZZY,
-B024,Cookies,2026-07-13,Publix,24,ct,0.25,22,OPEN,24 pack
+B024,Cookies,2026-07-13,Publix,24,ct,0.25,19,OPEN,24 pack
+B025,Oreo Sandwich Cookies,2026-07-15,Unlogged (estimated),1,bag,7.59,0.50,FUZZY,Estimated retroactively - no receipt; priced from later GoPuff purchase
+B026,Banana,2026-07-15,Unlogged (estimated),4,ct,0.31,2,FUZZY,Estimated retroactively - no receipt; priced from later GoPuff purchase
+B027,XL White Eggs,2026-07-18,Publix,18,ct,0.23,18,OPEN,
+B028,Chicken Thigh Fillets,2026-07-18,GoPuff,1.82,lb,3.41,1.82,FUZZY,Sanderson Farms - price prorated for order discount
+B029,Organic Baby Spinach,2026-07-18,GoPuff,1,bag,3.10,0.70,FUZZY,5oz - price prorated for order discount
+B030,Banana,2026-07-18,GoPuff,4,ct,0.31,4,FUZZY,price prorated for order discount
+B031,Milk 2% Reduced Fat,2026-07-18,GoPuff,1,bottle,4.09,1,FUZZY,Fairlife 52oz - price prorated for order discount
+B032,Oreo Sandwich Cookies,2026-07-18,GoPuff,1,bag,4.71,1,FUZZY,13.29oz - price prorated for order discount
+B033,Yellow Onion,2026-07-18,GoPuff,1,ct,0.61,1,FUZZY,price prorated for order discount
+B034,Mexican Four Cheese Blend,2026-07-18,GoPuff,2,bag,2.23,2,FUZZY,Essential Everyday 8oz x2 - price prorated for order discount
