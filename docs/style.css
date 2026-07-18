@@ -15,9 +15,14 @@
   --gridline:        #e1e0d9;
   --baseline:        #c3c2b7;
   --border:          rgba(11, 11, 11, 0.10);
-  /* categorical / status slots used by the charts */
-  --series-1:        #2a78d6;   /* blue  — primary spend hue */
-  --series-2:        #1baf7a;   /* aqua  — secondary */
+  /* categorical slots — fixed order per the dataviz palette, never cycled */
+  --series-1:        #2a78d6;   /* blue    — primary spend hue */
+  --series-2:        #1baf7a;   /* aqua    — secondary */
+  --series-3:        #eda100;   /* yellow  — category slot 3 */
+  --series-4:        #008300;   /* green   — category slot 4 */
+  --series-5:        #4a3aa7;   /* violet  — category slot 5 */
+  --series-6:        #e34948;   /* red     — category slot 6 */
+  /* status (reserved, never used for series identity) */
   --status-critical: #d03b3b;   /* waste */
   --good:            #006300;
 
@@ -36,6 +41,10 @@
     --border:         rgba(255, 255, 255, 0.10);
     --series-1:       #3987e5;
     --series-2:       #199e70;
+    --series-3:       #c98500;
+    --series-4:       #008300;
+    --series-5:       #9085e9;
+    --series-6:       #e66767;
     --status-critical:#d03b3b;
     --good:           #0ca30c;
   }
@@ -136,6 +145,51 @@ code {
   .tile--hero { grid-column: span 2; }
 }
 
+/* --- cost comparison callout ----------------------------------------- */
+.compare-card {
+  margin-top: 16px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px 20px;
+}
+.compare-stats {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 4vw, 32px);
+  flex-wrap: wrap;
+}
+.compare-stat { display: flex; flex-direction: column; gap: 2px; }
+.compare-stat__label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.compare-stat__value {
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.compare-stat__sub {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+.compare-stat--accent .compare-stat__value { color: var(--series-6); }
+.compare-vs {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.compare-delta {
+  margin: 14px 0 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+.compare-delta strong { color: var(--text-primary); }
+
 /* --- cards / grids -------------------------------------------------- */
 .charts,
 .tables {
@@ -216,6 +270,12 @@ td.num, th.num {
   font-variant-numeric: tabular-nums;
 }
 .table-scroll { overflow-x: auto; }
+.table-more {
+  margin: 10px 2px 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.table-more code { font-size: 0.85em; }
 
 /* status pill for inventory */
 .pill {
@@ -240,3 +300,63 @@ td.num, th.num {
   margin-right: 6px;
   vertical-align: baseline;
 }
+
+/* --- inventory level bar --------------------------------------------- */
+.bar-track {
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--gridline);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--series-1);
+}
+.bar-fill--low { background: var(--status-critical); }
+
+/* --- unified activity feed -------------------------------------------- */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+}
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--gridline);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex: 0 0 auto;
+  width: 1.4em;
+  text-align: center;
+}
+.activity-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.activity-title {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activity-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.activity-amount {
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+.activity-amount--neg { color: var(--status-critical); }

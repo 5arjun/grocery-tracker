@@ -204,18 +204,21 @@ They're listed so you understand what each column feeds:
 
 | Stat | Source |
 |------|--------|
-| `total_spent` | sum of `purchases.total_price` |
+| `total_spent` (grocery spend KPI) | sum of `purchases.total_price` |
+| `outside_food_total` | sum of `outside_food.cost` |
+| `outside_food_pct` | `outside_food_total / (total_spent + outside_food_total)` |
 | `total_meals_logged` | row count of `meals.csv` |
-| `avg_cost_per_meal` | average of `meals.est_cost` |
+| `avg_cost_per_meal` | average of `meals.est_cost` (home-cooked only — outside food is excluded) |
 | `avg_cost_breakfast / lunch / dinner` | average `est_cost` grouped by `meal_type` |
 | `total_waste_dollars` | sum of `waste.waste_value` |
 | `waste_pct` | `total_waste_dollars / total_spent` |
 | `total_trips` | distinct `purchases.trip_id` |
 | `avg_spend_per_trip` | `total_spent / total_trips` |
 | `meals_per_grocery_trip` | `total_meals_logged / total_trips` |
-| `top_items_by_cost` (5) | `purchases.total_price` summed per item |
-| `top_items_by_frequency` (5) | distinct meals per item in `meal_usage.csv` |
-| spend-over-time | `purchases.total_price` summed per `date` |
+| item breakdown (top 8) | per item: total cost from `purchases`, times used = distinct meals in `meal_usage.csv`, avg cost/use |
+| daily spend | `purchases.total_price` + `outside_food.cost` summed per `date`, shown stacked |
+| inventory table | `OPEN`/`FUZZY` batches only, sorted by remaining % ascending (lowest first), capped at 12 with a "+N more" note |
+| recent activity feed | purchases (grouped per trip), meals, outside food, and waste merged into one reverse-chronological list |
 
 ---
 

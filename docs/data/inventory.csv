@@ -23,13 +23,11 @@ B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,1.70,FUZZY,Skippy
 B022,Mint Choc Chip Ice Cream,2026-07-13,Publix,1,tub,6.19,0.85,FUZZY,
 B023,Cereal,2026-07-13,Publix,1,box,2.78,0.75,FUZZY,
 B024,Cookies,2026-07-13,Publix,24,ct,0.25,19,OPEN,24 pack
-B025,Oreo Sandwich Cookies,2026-07-15,GoPuff,1,bag,7.59,0.50,FUZZY,Estimated retroactively - no receipt; from GoPuff order, priced from later GoPuff purchase
-B026,Banana,2026-07-15,GoPuff,4,ct,0.31,2,FUZZY,Estimated retroactively - no receipt; from GoPuff order, priced from later GoPuff purchase
 B027,XL White Eggs,2026-07-18,Publix,18,ct,0.23,18,OPEN,
-B028,Chicken Thigh Fillets,2026-07-18,GoPuff,1.82,lb,3.41,1.82,FUZZY,Sanderson Farms - price prorated for order discount
-B029,Organic Baby Spinach,2026-07-18,GoPuff,1,bag,3.10,0.70,FUZZY,5oz - price prorated for order discount
-B030,Banana,2026-07-18,GoPuff,4,ct,0.31,4,FUZZY,price prorated for order discount
-B031,Milk 2% Reduced Fat,2026-07-18,GoPuff,1,bottle,4.09,1,FUZZY,Fairlife 52oz - price prorated for order discount
-B032,Oreo Sandwich Cookies,2026-07-18,GoPuff,1,bag,4.71,1,FUZZY,13.29oz - price prorated for order discount
-B033,Yellow Onion,2026-07-18,GoPuff,1,ct,0.61,1,FUZZY,price prorated for order discount
-B034,Mexican Four Cheese Blend,2026-07-18,GoPuff,2,bag,2.23,2,FUZZY,Essential Everyday 8oz x2 - price prorated for order discount
+B028,Chicken Thigh Fillets,2026-07-16,GoPuff,1.82,lb,3.41,1.82,FUZZY,Sanderson Farms - price prorated for order discount
+B029,Organic Baby Spinach,2026-07-16,GoPuff,1,bag,3.10,0.70,FUZZY,5oz - price prorated for order discount
+B030,Banana,2026-07-16,GoPuff,4,ct,0.31,2,FUZZY,"price prorated for order discount; qty_remaining reflects M0020 (1ct) + M0025 (1ct), previously misattributed to a duplicate placeholder batch (removed 2026-07-18)"
+B031,Milk 2% Reduced Fat,2026-07-16,GoPuff,1,bottle,4.09,1,FUZZY,Fairlife 52oz - price prorated for order discount
+B032,Oreo Sandwich Cookies,2026-07-16,GoPuff,1,bag,4.71,0.50,FUZZY,"13.29oz - price prorated for order discount; qty_remaining reflects M0019 (0.25 bag) + M0023 (0.25 bag), previously misattributed to a duplicate placeholder batch (removed 2026-07-18)"
+B033,Yellow Onion,2026-07-16,GoPuff,1,ct,0.61,1,FUZZY,price prorated for order discount
+B034,Mexican Four Cheese Blend,2026-07-16,GoPuff,2,bag,2.23,2,FUZZY,Essential Everyday 8oz x2 - price prorated for order discount

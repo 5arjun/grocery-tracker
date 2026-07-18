@@ -44,9 +44,9 @@ Column definitions and the rules for editing them live in
 
 Open the live URL and you get:
 
-- **KPI tiles** — total spent, avg cost per meal, waste %, grocery trips, meals logged
-- **Charts** — spend over time, avg cost by meal type, top items by cost, waste vs. spend
-- **Tables** — top items by frequency, current inventory, recent purchases / meals / waste
+- **KPI tiles** — grocery spend, outside food spend (% of total food $), avg cost per home-cooked meal, waste %, grocery trips, meals logged
+- **Charts** — daily spend (groceries vs. outside food, stacked), avg cost by meal type, groceries vs. outside food split, top items by cost, waste vs. grocery spend
+- **Tables** — item breakdown (cost + how often each item is used), inventory (open batches, lowest-remaining first), and a unified recent-activity feed mixing purchases, meals, outside food, and waste in one chronological list
 
 Everything is computed in the browser from the CSVs. With empty CSVs the page
 loads cleanly and shows a friendly "log your first receipt" state.
