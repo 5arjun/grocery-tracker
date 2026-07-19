@@ -17,10 +17,12 @@ M0015,2026-07-15,snack,milk and cereal,1.51,
 M0016,2026-07-16,breakfast,"apple and peanut butter",1.03,
 M0017,2026-07-16,lunch,"3 eggs, onions, red peppers, cottage cheese",1.64,
 M0018,2026-07-16,dinner,"tortilla, frozen veggies, onions, chicken, cheese, cottage cheese, rice",5.42,
-M0019,2026-07-16,snack,"carrots, mandarin, 2 cookies, milk, oreos",3.65,oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)
+M0019,2026-07-16,snack,"carrots, mandarin, 2 cookies, milk, oreos",3.65,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0020,2026-07-17,breakfast,"banana and peanut butter",0.68,
 M0021,2026-07-17,lunch,"bagel, creme cheese, cookie, carrots",2.26,
 M0022,2026-07-17,dinner,"pasta, pasta sauce, garlic paste, chicken, onions, frozen peppers",6.55,
-M0023,2026-07-17,snack,"2 mandarins, oreos, milk",2.78,oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)
+M0023,2026-07-17,snack,"2 mandarins, oreos, milk",2.78,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0024,2026-07-18,breakfast,"tortilla, 3 eggs (last of batch - finished), spinach, onions, red peppers, chicken slices",3.31,eggs batch B019 confirmed finished by user; chicken-slice batch B002 corrected to ~half remaining per user report
 M0025,2026-07-18,lunch,"banana, carrots",0.50,
+M0026,2026-07-18,dinner,"chicken, salad, rice, green peppers, onions",3.91,"green peppers (red bell peppers, batch B014) and onions (red onions, batch B013) confirmed finished by user - both last of first trip (2026-07-12); chicken drawn from B002 since B003 already depleted"
+M0027,2026-07-18,snack,"oreos, milk, cookie",2.25,
