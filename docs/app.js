@@ -78,6 +78,16 @@ function token(name) {
   return getComputedStyle(document.body).getPropertyValue(name).trim();
 }
 
+// inline SVG icon set — stroke-based, 24x24 viewBox, replaces emoji glyphs
+// (emoji render inconsistently across platforms and can't be themed/sized).
+const ICONS = {
+  grocery: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.3"/><circle cx="18" cy="21" r="1.3"/><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/></svg>',
+  meal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v7a2 2 0 0 0 4 0V2"/><path d="M8 9v13"/><path d="M17 2c-1.7 0-3 2.2-3 5s1.3 5 3 5v10"/></svg>',
+  outside: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 8Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
+  waste: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+};
+
 function esc(s) {
   return String(s ?? "").replace(/[&<>"]/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -229,6 +239,18 @@ function computeStats(data) {
   const wastePct = totalSpent > 0 ? (totalWaste / totalSpent) * 100 : 0;
   const hasWaste = waste.length > 0;
 
+  // --- money saved by cooking at home vs. eating out ---
+  const moneySaved = canCompareMealCost
+    ? totalMeals * (outsideAvgPerEvent - avgCostPerMeal) : null;
+
+  // --- pace: avg $/day and a projected 30-day spend ---
+  const daysTrackedCount = new Set([
+    ...purchases.map((r) => (r.date || "").trim()),
+    ...outsideFood.map((r) => (r.date || "").trim()),
+  ].filter(Boolean)).size;
+  const avgSpendPerDay = daysTrackedCount ? foodTotal / daysTrackedCount : 0;
+  const projectedMonthlySpend = daysTrackedCount ? avgSpendPerDay * 30 : 0;
+
   // --- inventory: active batches only, lowest fraction-remaining first ---
   const activeInventoryAll = inventory
     .filter((r) => ["OPEN", "FUZZY"].includes(String(r.status || "").trim().toUpperCase()))
@@ -250,6 +272,21 @@ function computeStats(data) {
   const INVENTORY_LIMIT = 12;
   const activeInventory = activeInventoryAll.slice(0, INVENTORY_LIMIT);
   const activeInventoryMoreCount = Math.max(0, activeInventoryAll.length - INVENTORY_LIMIT);
+  const lowStockCount = activeInventoryAll.filter((r) => r.pctRemaining != null && r.pctRemaining <= 20).length;
+
+  // top wasted items — where spoilage/waste dollars actually go
+  const wasteByItem = new Map();
+  for (const r of waste) {
+    const item = (r.item || "").trim();
+    if (!item) continue;
+    const v = num(r.waste_value);
+    const val = Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost);
+    wasteByItem.set(item, (wasteByItem.get(item) || 0) + val);
+  }
+  const topWastedItems = [...wasteByItem.entries()]
+    .map(([item, total]) => ({ item, total }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5);
 
   // --- days tracked ---
   const allDates = new Set([
@@ -278,7 +315,6 @@ function computeStats(data) {
     const total = rows.reduce((s, r) => s + n0(r.total_price), 0);
     activity.push({
       date: (first.date || "").trim(),
-      icon: "🛒",
       type: "grocery",
       title: `${first.store || "Grocery"} trip — ${rows.length} item${rows.length === 1 ? "" : "s"}`,
       amount: total,
@@ -289,7 +325,6 @@ function computeStats(data) {
     const c = num(r.est_cost);
     activity.push({
       date: (r.date || "").trim(),
-      icon: "🍽️",
       type: "meal",
       title: `${cap((r.meal_type || "").trim().toLowerCase())} — ${r.description || ""}`,
       amount: Number.isFinite(c) ? c : null,
@@ -299,7 +334,6 @@ function computeStats(data) {
   for (const r of outsideFood) {
     activity.push({
       date: (r.date || "").trim(),
-      icon: "🍴",
       type: "outside",
       title: r.description || "Outside food",
       amount: n0(r.cost),
@@ -310,7 +344,6 @@ function computeStats(data) {
     const v = num(r.waste_value);
     activity.push({
       date: (r.date || "").trim(),
-      icon: "🗑️",
       type: "waste",
       title: `Wasted ${r.item || "item"}`,
       amount: -(Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost)),
@@ -329,8 +362,10 @@ function computeStats(data) {
     totalMeals, avgCostPerMeal, avgByMealType, mealsPerTrip, itemBreakdown,
     totalWaste, wastePct, hasWaste,
     outsideFoodTotal, hasOutsideFood, foodTotal, outsideFoodPct,
-    outsideAvgPerEvent, canCompareMealCost, eatingOutMultiplier,
-    activeInventory, activeInventoryMoreCount, dateRangeLabel, activity: activity.slice(0, 25),
+    outsideAvgPerEvent, canCompareMealCost, eatingOutMultiplier, moneySaved,
+    avgSpendPerDay, projectedMonthlySpend, daysTrackedCount,
+    activeInventory, activeInventoryMoreCount, lowStockCount, dateRangeLabel,
+    topWastedItems, activity: activity.slice(0, 25),
     hasPurchases: purchases.length > 0,
     hasMeals: meals.length > 0,
   };
@@ -347,12 +382,21 @@ function renderKpis(s) {
   set("kpi-outside-food", s.hasOutsideFood ? fmtMoney0(s.outsideFoodTotal) : "—");
   set("kpi-outside-food-sub", s.hasOutsideFood ? `${fmtPct(s.outsideFoodPct)} of food $` : "");
 
-  set("kpi-avg-meal", s.totalMeals && s.avgCostPerMeal ? fmtMoney(s.avgCostPerMeal) : "—");
+  set("kpi-avg-day", s.daysTrackedCount ? fmtMoney(s.avgSpendPerDay) : "—");
+  set("kpi-avg-day-sub", s.daysTrackedCount ? `≈${fmtMoney0(s.projectedMonthlySpend)} / 30 days` : "");
 
   set("kpi-waste-pct", s.hasPurchases ? fmtPct(s.wastePct) : "—");
-  set("kpi-waste-sub", s.hasWaste
-    ? `${fmtMoney(s.totalWaste)} wasted`
-    : (s.hasPurchases ? "no waste logged 🎉" : ""));
+  const wasteSub = document.getElementById("kpi-waste-sub");
+  wasteSub.textContent = s.hasWaste ? `${fmtMoney(s.totalWaste)} wasted` : (s.hasPurchases ? "no waste logged" : "");
+  wasteSub.classList.toggle("tile__sub--good", s.hasPurchases && !s.hasWaste);
+
+  const lowStockTile = document.getElementById("tile-lowstock");
+  if (s.lowStockCount > 0) {
+    lowStockTile.hidden = false;
+    set("kpi-lowstock", String(s.lowStockCount));
+  } else {
+    lowStockTile.hidden = true;
+  }
 
   set("kpi-trips", s.totalTrips ? String(s.totalTrips) : "—");
   set("kpi-trips-sub", s.totalTrips && s.totalMeals
@@ -370,6 +414,14 @@ function renderCompareCard(s) {
   set("compare-home-sub", s.totalMeals ? `avg across ${s.totalMeals} meal${s.totalMeals === 1 ? "" : "s"}` : "");
   set("compare-outside", s.hasOutsideFood ? fmtMoney(s.outsideAvgPerEvent) : "—");
   set("compare-outside-sub", s.hasOutsideFood ? "avg per event" : "");
+
+  const savedWrap = document.getElementById("compare-saved-wrap");
+  if (s.canCompareMealCost && s.moneySaved != null && s.moneySaved > 0) {
+    savedWrap.hidden = false;
+    set("compare-saved", fmtMoney0(s.moneySaved));
+  } else {
+    savedWrap.hidden = true;
+  }
 
   const delta = document.getElementById("compare-delta");
   if (s.canCompareMealCost) {
@@ -661,7 +713,25 @@ function renderCumulativeChart(s) {
   });
 }
 
+// Chart.js draws legends into the canvas at a fixed pixel size — with 5-6
+// long "Category — $XX (XX%)" labels that either clips or overlaps in a
+// short box. Real HTML text wraps naturally and stays crisp at any zoom.
+function renderCategoryLegend(s) {
+  const el = document.getElementById("legend-category");
+  if (!el) return;
+  el.hidden = s.spendByCategory.length === 0;
+  el.innerHTML = s.spendByCategory.map((c) => {
+    const color = token(CATEGORY_COLOR_SLOTS[c.category] || "--series-6");
+    return `<li class="legend-list__item">
+      <span class="key" style="background:${color}"></span>
+      <span class="legend-list__name">${esc(c.category)}</span>
+      <span class="legend-list__value">${fmtMoney0(c.total)} · ${c.pct.toFixed(0)}%</span>
+    </li>`;
+  }).join("");
+}
+
 function renderCategoryChart(s) {
+  renderCategoryLegend(s);
   if (!toggleChart("chart-category", "empty-category", s.spendByCategory.length > 0)) return;
   const surface = token("--surface-1");
   const datasets = s.spendByCategory.map((c) => ({
@@ -681,23 +751,7 @@ function renderCategoryChart(s) {
       indexAxis: "y",
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: true, position: "bottom",
-          labels: {
-            color: token("--text-secondary"),
-            boxWidth: 10, boxHeight: 10, padding: 12,
-            font: { size: 12 },
-            // direct labels via the legend text (category + $ + %) — the
-            // secondary encoding the CVD/contrast WARN on this palette requires
-            generateLabels: (chart) => chart.data.datasets.map((ds, i) => ({
-              text: `${ds.label} — ${fmtMoney0(ds._total)} (${ds._pct.toFixed(0)}%)`,
-              fillStyle: ds.backgroundColor,
-              strokeStyle: ds.backgroundColor,
-              lineWidth: 0,
-              datasetIndex: i,
-            })),
-          },
-        },
+        legend: { display: false }, // HTML legend below the chart replaces this
         tooltip: {
           ...tooltipStyle(),
           callbacks: { label: (i) => `${i.dataset.label}: ${fmtMoney(i.dataset._total)} (${i.dataset._pct.toFixed(0)}%)` },
@@ -776,6 +830,15 @@ function renderTables(data, stats) {
       `<p class="table-more">+${stats.activeInventoryMoreCount} more open batch${stats.activeInventoryMoreCount === 1 ? "" : "es"} — see <code>inventory.csv</code></p>`);
   }
 
+  // most wasted items — where spoilage dollars go
+  buildTable("table-wasted",
+    [
+      { key: "item", label: "Item" },
+      { label: "Wasted", num: true, render: (r) => fmtMoney(r.total) },
+    ],
+    stats.topWastedItems,
+    "No waste logged.");
+
   // unified activity feed
   const el = document.getElementById("table-activity");
   if (!stats.activity.length) {
@@ -786,7 +849,7 @@ function renderTables(data, stats) {
     const amountCls = a.amount != null && a.amount < 0 ? " activity-amount--neg" : "";
     const amountTxt = a.amount == null ? "—" : (a.amount < 0 ? "-" : "") + fmtMoney(Math.abs(a.amount));
     return `<div class="activity-item">
-      <span class="activity-icon" aria-hidden="true">${a.icon}</span>
+      <span class="activity-icon-chip activity-icon-chip--${a.type}" aria-hidden="true">${ICONS[a.type] || ""}</span>
       <div class="activity-main">
         <span class="activity-title">${esc(a.title)}</span>
         <span class="activity-date">${esc(fmtDateShort(a.date))}</span>
@@ -816,10 +879,36 @@ function renderLastUpdated(loaded) {
 
 let CACHE = null; // parsed rows, so we can re-render on theme change
 
+// tiny trend line in the hero tile — last ~14 days of total food spend
+function renderHeroSparkline(s) {
+  const el = document.getElementById("kpi-spark");
+  if (!el) return;
+  const days = s.dailySpend.slice(-14).map((d) => d.groceries + d.outside);
+  if (days.length < 2) { el.innerHTML = ""; return; }
+  const w = 120, h = 36, pad = 3;
+  const max = Math.max(...days, 0.01);
+  const min = Math.min(0, ...days);
+  const range = (max - min) || 1;
+  const stepX = (w - pad * 2) / (days.length - 1);
+  const pts = days.map((v, i) => [
+    pad + i * stepX,
+    h - pad - ((v - min) / range) * (h - pad * 2),
+  ]);
+  const line = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const [lastX, lastY] = pts[pts.length - 1];
+  const area = `${pad},${h - pad} ${line} ${lastX.toFixed(1)},${h - pad}`;
+  const color = token("--series-1");
+  el.innerHTML =
+    `<polyline points="${area}" fill="${color}" opacity="0.12" stroke="none"></polyline>` +
+    `<polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline>` +
+    `<circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.3" fill="${color}"></circle>`;
+}
+
 function renderAll() {
   if (!CACHE) return;
   const stats = computeStats(CACHE);
   renderKpis(stats);
+  renderHeroSparkline(stats);
   renderCompareCard(stats);
   Object.values(charts).forEach((c) => c && c.destroy());
   renderDailySpendChart(stats);

@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
   <title>Grocery Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <!-- Data & charting libraries load from CDNs (needs internet to view). -->
   <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -13,153 +16,210 @@
 </head>
 <body class="viz-root">
   <header class="site-header">
-    <div class="wrap">
-      <h1>🛒 Grocery Tracker</h1>
+    <div class="wrap site-header__row">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1.3"/><circle cx="18" cy="21" r="1.3"/>
+            <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/>
+          </svg>
+        </span>
+        <h1>Grocery Tracker</h1>
+      </div>
       <p class="updated" id="last-updated" hidden></p>
     </div>
   </header>
 
   <main class="wrap">
-    <!-- KPI tiles -->
-    <section class="kpis" aria-label="Key stats">
-      <div class="tile tile--hero">
-        <span class="tile__label">Grocery spend</span>
-        <span class="tile__value" id="kpi-grocery-spend">—</span>
-        <span class="tile__sub" id="kpi-grocery-spend-sub"></span>
-      </div>
-      <div class="tile">
-        <span class="tile__label">Outside food</span>
-        <span class="tile__value" id="kpi-outside-food">—</span>
-        <span class="tile__sub" id="kpi-outside-food-sub"></span>
-      </div>
-      <div class="tile">
-        <span class="tile__label">Avg / home meal</span>
-        <span class="tile__value" id="kpi-avg-meal">—</span>
-      </div>
-      <div class="tile">
-        <span class="tile__label">Waste</span>
-        <span class="tile__value" id="kpi-waste-pct">—</span>
-        <span class="tile__sub" id="kpi-waste-sub"></span>
-      </div>
-      <div class="tile">
-        <span class="tile__label">Grocery trips</span>
-        <span class="tile__value" id="kpi-trips">—</span>
-        <span class="tile__sub" id="kpi-trips-sub"></span>
-      </div>
-      <div class="tile">
-        <span class="tile__label">Meals logged</span>
-        <span class="tile__value" id="kpi-meals">—</span>
-        <span class="tile__sub" id="kpi-meals-sub"></span>
+    <!-- Overview: the numbers that answer "how am I doing right now" -->
+    <section class="section" aria-label="Overview">
+      <h2 class="section-title">Overview</h2>
+      <div class="kpis">
+        <div class="tile tile--hero">
+          <div class="tile--hero__top">
+            <div>
+              <span class="tile__label">Total food spend</span>
+              <span class="tile__value" id="kpi-grocery-spend">—</span>
+              <span class="tile__sub" id="kpi-grocery-spend-sub"></span>
+            </div>
+            <svg class="tile__spark" id="kpi-spark" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Outside food</span>
+          <span class="tile__value" id="kpi-outside-food">—</span>
+          <span class="tile__sub" id="kpi-outside-food-sub"></span>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Avg / day</span>
+          <span class="tile__value" id="kpi-avg-day">—</span>
+          <span class="tile__sub" id="kpi-avg-day-sub"></span>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Waste</span>
+          <span class="tile__value" id="kpi-waste-pct">—</span>
+          <span class="tile__sub" id="kpi-waste-sub"></span>
+        </div>
+        <div class="tile tile--alert" id="tile-lowstock" hidden>
+          <span class="tile__label">
+            <svg class="tile__label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.6 18a1.6 1.6 0 0 0 1.4 2.4h16a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+            Low on stock
+          </span>
+          <span class="tile__value" id="kpi-lowstock">—</span>
+          <span class="tile__sub">items under 20% remaining</span>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Grocery trips</span>
+          <span class="tile__value" id="kpi-trips">—</span>
+          <span class="tile__sub" id="kpi-trips-sub"></span>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Meals logged</span>
+          <span class="tile__value" id="kpi-meals">—</span>
+          <span class="tile__sub" id="kpi-meals-sub"></span>
+        </div>
       </div>
     </section>
 
     <!-- Cost-per-meal callout: a headline comparison, not a chart -->
-    <section class="compare-card" aria-label="Home-cooked vs. eating out">
-      <div class="card__head">
-        <h2>Cost per meal: home-cooked vs. eating out</h2>
-        <p class="card__sub">Home-cooked average vs. average outside food event</p>
-      </div>
-      <div class="compare-stats">
-        <div class="compare-stat">
-          <span class="compare-stat__label">Home-cooked</span>
-          <span class="compare-stat__value" id="compare-home">—</span>
-          <span class="compare-stat__sub" id="compare-home-sub"></span>
+    <section class="section" aria-label="Home-cooked vs. eating out">
+      <div class="compare-card">
+        <div class="card__head">
+          <h2>Cost per meal: home-cooked vs. eating out</h2>
+          <p class="card__sub">Home-cooked average vs. average outside food event</p>
         </div>
-        <span class="compare-vs">vs</span>
-        <div class="compare-stat compare-stat--accent">
-          <span class="compare-stat__label">Eating out</span>
-          <span class="compare-stat__value" id="compare-outside">—</span>
-          <span class="compare-stat__sub" id="compare-outside-sub"></span>
+        <div class="compare-stats">
+          <div class="compare-stat">
+            <span class="compare-stat__label">Home-cooked</span>
+            <span class="compare-stat__value" id="compare-home">—</span>
+            <span class="compare-stat__sub" id="compare-home-sub"></span>
+          </div>
+          <span class="compare-vs">vs</span>
+          <div class="compare-stat compare-stat--accent">
+            <span class="compare-stat__label">Eating out</span>
+            <span class="compare-stat__value" id="compare-outside">—</span>
+            <span class="compare-stat__sub" id="compare-outside-sub"></span>
+          </div>
+          <div class="compare-stat compare-stat--saved" id="compare-saved-wrap" hidden>
+            <span class="compare-stat__label">Saved by cooking</span>
+            <span class="compare-stat__value" id="compare-saved">—</span>
+            <span class="compare-stat__sub">vs. eating out every time</span>
+          </div>
         </div>
+        <p class="compare-delta" id="compare-delta"></p>
       </div>
-      <p class="compare-delta" id="compare-delta"></p>
     </section>
 
-    <!-- Charts -->
-    <section class="charts" aria-label="Charts">
-      <div class="card">
-        <div class="card__head">
-          <h2>Daily food spend</h2>
-          <p class="card__sub">Groceries vs. outside food, per day</p>
+    <!-- Spending trends over time -->
+    <section class="section" aria-label="Spending trends">
+      <h2 class="section-title">Spending trends</h2>
+      <div class="charts">
+        <div class="card">
+          <div class="card__head">
+            <h3>Daily food spend</h3>
+            <p class="card__sub">Groceries vs. outside food, per day</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box"><canvas id="chart-dailyspend"></canvas></div>
+            <p class="empty" id="empty-dailyspend" hidden>No spend logged yet.</p>
+          </div>
         </div>
-        <div class="card__body">
-          <div class="chart-box"><canvas id="chart-dailyspend"></canvas></div>
-          <p class="empty" id="empty-dailyspend" hidden>No spend logged yet.</p>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="card__head">
-          <h2>Cumulative food spend</h2>
-          <p class="card__sub">Running total, groceries + outside food</p>
-        </div>
-        <div class="card__body">
-          <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
-          <p class="empty" id="empty-cumulative" hidden>No spend logged yet.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__head">
-          <h2>Avg cost by meal type</h2>
-          <p class="card__sub">Home-cooked meals, estimated cost</p>
-        </div>
-        <div class="card__body">
-          <div class="chart-box"><canvas id="chart-mealtype"></canvas></div>
-          <p class="empty" id="empty-mealtype" hidden>No meals logged yet.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__head">
-          <h2>Top items by cost</h2>
-          <p class="card__sub">Highest total spend across all trips</p>
-        </div>
-        <div class="card__body">
-          <div class="chart-box"><canvas id="chart-topitems"></canvas></div>
-          <p class="empty" id="empty-topitems" hidden>No purchases logged yet.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__head">
-          <h2>Spending by category</h2>
-          <p class="card__sub">Where your grocery dollars went</p>
-        </div>
-        <div class="card__body">
-          <div class="chart-box chart-box--short"><canvas id="chart-category"></canvas></div>
-          <p class="empty" id="empty-category" hidden>No purchases logged yet.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__head">
-          <h2>Groceries vs. outside food</h2>
-          <p class="card__sub">Where your food dollars went</p>
-        </div>
-        <div class="card__body">
-          <div class="chart-box chart-box--short"><canvas id="chart-splitfood"></canvas></div>
-          <p class="empty" id="empty-splitfood" hidden>No spend logged yet.</p>
+        <div class="card">
+          <div class="card__head">
+            <h3>Cumulative food spend</h3>
+            <p class="card__sub">Running total, groceries + outside food</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
+            <p class="empty" id="empty-cumulative" hidden>No spend logged yet.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Tables -->
-    <section class="tables" aria-label="Data tables">
-      <div class="card card--wide">
-        <div class="card__head"><h2>Item breakdown</h2>
-          <p class="card__sub">What you buy most, and what it costs</p></div>
-        <div class="card__body" id="table-itembreakdown"></div>
+    <!-- What the money goes toward -->
+    <section class="section" aria-label="Where the money goes">
+      <h2 class="section-title">Where the money goes</h2>
+      <div class="charts">
+        <div class="card">
+          <div class="card__head">
+            <h3>Spending by category</h3>
+            <p class="card__sub">Where your grocery dollars went</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box chart-box--bar"><canvas id="chart-category"></canvas></div>
+            <ul class="legend-list" id="legend-category"></ul>
+            <p class="empty" id="empty-category" hidden>No purchases logged yet.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <h3>Groceries vs. outside food</h3>
+            <p class="card__sub">Where your food dollars went</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box chart-box--short"><canvas id="chart-splitfood"></canvas></div>
+            <p class="empty" id="empty-splitfood" hidden>No spend logged yet.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <h3>Top items by cost</h3>
+            <p class="card__sub">Highest total spend across all trips</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box"><canvas id="chart-topitems"></canvas></div>
+            <p class="empty" id="empty-topitems" hidden>No purchases logged yet.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <h3>Avg cost by meal type</h3>
+            <p class="card__sub">Home-cooked meals, estimated cost</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box"><canvas id="chart-mealtype"></canvas></div>
+            <p class="empty" id="empty-mealtype" hidden>No meals logged yet.</p>
+          </div>
+        </div>
+
+        <div class="card card--wide">
+          <div class="card__head"><h3>Item breakdown</h3>
+            <p class="card__sub">What you buy most, and what it costs</p></div>
+          <div class="card__body" id="table-itembreakdown"></div>
+        </div>
       </div>
-      <div class="card card--wide">
-        <div class="card__head"><h2>Inventory</h2>
-          <p class="card__sub">Open batches, lowest remaining first</p></div>
-        <div class="card__body" id="table-inventory"></div>
+    </section>
+
+    <!-- Inventory & waste -->
+    <section class="section" aria-label="Inventory and waste">
+      <h2 class="section-title">Inventory &amp; waste</h2>
+      <div class="tables">
+        <div class="card card--wide">
+          <div class="card__head"><h3>Inventory</h3>
+            <p class="card__sub">Open batches, lowest remaining first</p></div>
+          <div class="card__body" id="table-inventory"></div>
+        </div>
+        <div class="card card--wide">
+          <div class="card__head"><h3>Most wasted items</h3>
+            <p class="card__sub">Where spoilage dollars are going</p></div>
+          <div class="card__body" id="table-wasted"></div>
+        </div>
       </div>
-      <div class="card card--wide">
-        <div class="card__head"><h2>Recent activity</h2>
-          <p class="card__sub">Purchases, meals, outside food & waste, newest first</p></div>
-        <div class="card__body" id="table-activity"></div>
+    </section>
+
+    <!-- Activity -->
+    <section class="section" aria-label="Recent activity">
+      <h2 class="section-title">Recent activity</h2>
+      <div class="tables">
+        <div class="card card--wide">
+          <div class="card__head"><p class="card__sub">Purchases, meals, outside food &amp; waste, newest first</p></div>
+          <div class="card__body" id="table-activity"></div>
+        </div>
       </div>
     </section>
   </main>
