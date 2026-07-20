@@ -105,8 +105,24 @@ M0025,B007,Baby Cut Carrots,0.05,bag,yes,
 M0026,B002,Sliced Rotisserie Chicken,0.25,pkg,yes,B003 batch already depleted - FIFO moves to B002
 M0026,B009,American Salad,0.2,bag,yes,
 M0026,B020,Basmati Rice,0.15,bag,yes,
-M0026,B014,Red Bell Peppers,0.02,lb,yes,"green pepper = red bell peppers; last of batch - user confirmed finished 2026-07-18"
+M0026,B014,Red Bell Peppers,0.02,lb,yes,"green pepper = red bell peppers; estimate reached ~0 here, but batch stayed OPEN - correction 2026-07-20: this was not an explicit user confirmation of finished, see M0030 for actual finish"
 M0026,B013,Red Onions,0.05,lb,yes,last of batch - user confirmed finished 2026-07-18
 M0027,B032,Oreo Sandwich Cookies,0.25,bag,yes,
 M0027,B004,Milk Fat Free,0.15,bottle,yes,
 M0027,B024,Cookies,1,ct,no,
+M0028,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0028,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0029,B012,Plain Bagels,1,ct,no,
+M0029,B002,Sliced Rotisserie Chicken,0.13,pkg,yes,
+M0029,B018,Shredded Mexican Cheese,0.1,bag,yes,
+M0030,B011,Burrito Tortillas,1,ct,no,
+M0030,B002,Sliced Rotisserie Chicken,0.15,pkg,yes,FIFO continues from B002 since B003 depleted
+M0030,B014,Red Bell Peppers,0.02,lb,yes,"green pepper/red pepper = this batch per established convention; user confirmed finished today - last of batch"
+M0030,B033,Yellow Onion,0.15,ct,yes,"user said ""from new onion"" - only open onion batch"
+M0030,B018,Shredded Mexican Cheese,0.1,bag,yes,
+M0030,B020,Basmati Rice,0.15,bag,yes,
+M0030,B006,Cottage Cheese Lowfat Pineapple,0.15,tub,yes,"already-negative estimate, continuing per Rule 1"
+M0030,B029,Organic Baby Spinach,0.2,bag,yes,
+M0031,B032,Oreo Sandwich Cookies,0.25,bag,yes,
+M0031,B024,Cookies,1,ct,no,
+M0031,B004,Milk Fat Free,0.15,bottle,yes,

@@ -24,5 +24,9 @@ M0022,2026-07-17,dinner,"pasta, pasta sauce, garlic paste, chicken, onions, froz
 M0023,2026-07-17,snack,"2 mandarins, oreos, milk",2.78,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0024,2026-07-18,breakfast,"tortilla, 3 eggs (last of batch - finished), spinach, onions, red peppers, chicken slices",3.31,eggs batch B019 confirmed finished by user; chicken-slice batch B002 corrected to ~half remaining per user report
 M0025,2026-07-18,lunch,"banana, carrots",0.50,
-M0026,2026-07-18,dinner,"chicken, salad, rice, green peppers, onions",3.91,"green peppers (red bell peppers, batch B014) and onions (red onions, batch B013) confirmed finished by user - both last of first trip (2026-07-12); chicken drawn from B002 since B003 already depleted"
+M0026,2026-07-18,dinner,"chicken, salad, rice, green peppers, onions",3.91,"onions (red onions, batch B013) confirmed finished by user - last of first trip (2026-07-12); chicken drawn from B002 since B003 already depleted; correction 2026-07-20: green peppers (batch B014) here were earlier (wrongly) noted as user-confirmed finished - that was an AI assumption, not something the user said. B014 actually stayed open until 2026-07-19 (see M0030)"
 M0027,2026-07-18,snack,"oreos, milk, cookie",2.25,
+M0028,2026-07-19,breakfast,apple and peanut butter,1.03,
+M0029,2026-07-19,lunch,"bagel, chicken slices, cheese",2.40,chicken slices drawn from B002 (deli rotisserie chicken)
+M0030,2026-07-19,dinner,"chicken, tortilla, red pepper (finished), onion, cheese, rice, cottage cheese, spinach",3.89,"red pepper = red bell peppers (batch B014), user confirmed finished today - corrects a wrong 7/18 closure of this same batch (see inventory note); chicken continues from B002 (deli rotisserie) per FIFO since B003 depleted; onion drawn from batch B033 (yellow onion) per user's ""from new onion"""
+M0031,2026-07-19,snack,"oreos, cookie, milk",2.25,
