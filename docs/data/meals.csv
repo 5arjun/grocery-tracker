@@ -30,3 +30,10 @@ M0028,2026-07-19,breakfast,apple and peanut butter,1.03,
 M0029,2026-07-19,lunch,"bagel, chicken slices, cheese",2.40,chicken slices drawn from B002 (deli rotisserie chicken)
 M0030,2026-07-19,dinner,"chicken, tortilla, red pepper (finished), onion, cheese, rice, cottage cheese, spinach",3.89,"red pepper = red bell peppers (batch B014), user confirmed finished today - corrects a wrong 7/18 closure of this same batch (see inventory note); chicken continues from B002 (deli rotisserie) per FIFO since B003 depleted; onion drawn from batch B033 (yellow onion) per user's ""from new onion"""
 M0031,2026-07-19,snack,"oreos, cookie, milk",2.25,
+M0032,2026-07-20,breakfast,"3 eggs, cheese",0.99,
+M0033,2026-07-20,lunch,"bagel, creme cheese, banana",1.75,bagel use brings batch B012 to exactly 0 - flagged for confirmation
+M0034,2026-07-20,snack,"carrots, milk (finished first one), cookies",1.37,"milk = batch B004, user confirmed finished - closing out batch"
+M0035,2026-07-21,breakfast,"3 eggs, onions, cottage cheese, spinach",1.96,onion drawn from B033 (yellow onion) - only open onion batch
+M0036,2026-07-21,lunch,"banana, peanut butter, 2 mandarins, carrots",2.03,banana use brings batch B030 to exactly 0
+M0037,2026-07-21,dinner,"pasta, chicken, pasta sauce, garlic paste, onions, frozen peppers, spinach, cheese",5.34,"chicken drawn from B028 (chicken thigh fillets) per user confirmation - B003 (usual pasta chicken) depleted; pasta sauce (B015) was already near-empty (0.01 remaining) and is now negative - batch likely needs replacing soon"
+M0038,2026-07-21,snack,"milk, cereal",1.31,milk drawn from B031 (2% reduced fat) since B004 closed out this same day

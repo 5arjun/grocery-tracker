@@ -126,3 +126,29 @@ M0030,B029,Organic Baby Spinach,0.2,bag,yes,
 M0031,B032,Oreo Sandwich Cookies,0.25,bag,yes,
 M0031,B024,Cookies,1,ct,no,
 M0031,B004,Milk Fat Free,0.15,bottle,yes,
+M0032,B027,XL White Eggs,3,ct,no,
+M0032,B018,Shredded Mexican Cheese,0.1,bag,yes,
+M0033,B012,Plain Bagels,1,ct,no,brings batch to exactly 0 - flagged for confirmation
+M0033,B005,Whipped Cream Cheese,0.15,tub,yes,
+M0033,B030,Banana,1,ct,yes,
+M0034,B007,Baby Cut Carrots,0.15,bag,yes,already-negative estimate continuing per Rule 1
+M0034,B004,Milk Fat Free,0.1,bottle,yes,user confirmed batch finished - closing out
+M0034,B024,Cookies,1,ct,no,
+M0035,B027,XL White Eggs,3,ct,no,
+M0035,B033,Yellow Onion,0.1,ct,yes,only open onion batch
+M0035,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,already-negative estimate continuing per Rule 1
+M0035,B029,Organic Baby Spinach,0.2,bag,yes,
+M0036,B030,Banana,1,ct,yes,brings batch to exactly 0
+M0036,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0036,B008,Mandarins,2,ct,yes,
+M0036,B007,Baby Cut Carrots,0.15,bag,yes,already-negative estimate continuing per Rule 1
+M0037,B017,Rigatoni Pasta,0.25,box,yes,brings batch to exactly 0
+M0037,B015,Robusto 6 Cheese Pasta Sauce,0.33,jar,yes,was already near-empty (0.01) before this use - now negative
+M0037,B010,Garlic Blend,0.15,pkg,yes,garlic paste
+M0037,B033,Yellow Onion,0.1,ct,yes,
+M0037,B001,Pepper Trio,0.15,pkg,yes,frozen peppers = pepper trio
+M0037,B029,Organic Baby Spinach,0.2,bag,yes,
+M0037,B018,Shredded Mexican Cheese,0.1,bag,yes,
+M0037,B028,Chicken Thigh Fillets,0.3,lb,yes,user confirmed - first use of this batch; B003 (usual pasta chicken) depleted
+M0038,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
+M0038,B023,Cereal,0.25,box,yes,

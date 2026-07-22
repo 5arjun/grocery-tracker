@@ -1,33 +1,33 @@
 batch_id,item,date_purchased,store,qty_purchased,unit,unit_cost,qty_remaining,status,notes
-B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.40,FUZZY,Publix 14oz
-B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,-0.03,FUZZY,"Publix 16oz; qty_remaining reset to 0.5 pkg per user's 2026-07-18 report ('half left') - prior estimate was too high, historical meal_usage scaled down accordingly; used 0.25 pkg in M0026 dinner (B003 already depleted, FIFO moved here); used 0.13 pkg in M0029 lunch + 0.15 pkg in M0030 dinner on 2026-07-19, estimate now slightly negative - portion sizes likely running a bit high"
+B001,Pepper Trio,2026-07-12,Publix,1,pkg,2.99,0.25,FUZZY,Publix 14oz
+B002,Sliced Rotisserie Chicken,2026-07-12,Publix,1,pkg,9.09,-0.03,FUZZY,"Publix 16oz; qty_remaining reset to 0.5 pkg per user's 2026-07-18 report ('half left') - prior estimate was too high, historical meal_usage scaled down accordingly; used 0.25 pkg in M0026 dinner (B003 already depleted, FIFO moved here); used 0.13 pkg in M0029 lunch + 0.15 pkg in M0030 dinner on 2026-07-19, estimate now slightly negative - portion sizes likely running a bit high; 2026-07-21 pasta dinner (M0037) drew from B028 instead per user confirmation, not this batch"
 B003,Boneless Chicken Breast,2026-07-12,Publix,1,pkg,12.23,0,DEPLETED,Perdue; user confirmed finished 2026-07-18
-B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,-0.05,FUZZY,"Fairlife; estimate ran negative as of 2026-07-19 snack (M0031) - user confirmed still on this (first) batch, not yet on B031"
-B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,0.85,FUZZY,Publix
-B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,-0.30,FUZZY,"Publix 16oz; used twice on 2026-07-16 (lunch+dinner), estimate ran negative - likely near/at empty; used again 2026-07-19 dinner (M0030)"
-B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,0.00,FUZZY,"Publix; estimate hit exactly 0 as of 2026-07-18 - flagged for user confirmation"
-B008,Mandarins,2026-07-12,Publix,18,ct,0.39,10,FUZZY,3lb bag ~18ct
+B004,Milk Fat Free,2026-07-12,Publix,1,bottle,5.46,0,DEPLETED,"Fairlife; user confirmed finished 2026-07-20 snack (M0034)"
+B005,Whipped Cream Cheese,2026-07-12,Publix,1,tub,3.49,0.70,FUZZY,Publix
+B006,Cottage Cheese Lowfat Pineapple,2026-07-12,Publix,1,tub,2.93,-0.50,FUZZY,"Publix 16oz; used twice on 2026-07-16 (lunch+dinner), estimate ran negative - likely near/at empty; used again 2026-07-19 dinner (M0030) and 2026-07-21 breakfast (M0035), estimate increasingly negative - portion sizes likely running a bit high"
+B007,Baby Cut Carrots,2026-07-12,Publix,1,bag,3.79,-0.30,FUZZY,"Publix; estimate hit exactly 0 as of 2026-07-18 - flagged for user confirmation; used again 2026-07-20 snack (M0034) and 2026-07-21 lunch (M0036), now negative"
+B008,Mandarins,2026-07-12,Publix,18,ct,0.39,8,FUZZY,3lb bag ~18ct
 B009,American Salad,2026-07-12,Publix,1,bag,4.15,0.40,FUZZY,Publix
-B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.55,FUZZY,
+B010,Garlic Blend,2026-07-12,Publix,1,pkg,5.15,0.40,FUZZY,
 B011,Burrito Tortillas,2026-07-12,Publix,8,ct,0.42,4,OPEN,La Banderita 10 inch
-B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,1,OPEN,Thomas
+B012,Plain Bagels,2026-07-12,Publix,6,ct,0.92,1,OPEN,"Thomas; exact-count inference said 0 remaining after M0033 (2026-07-20 lunch), but user confirmed 2026-07-22 that 1 bagel is actually left - one prior 1ct usage was likely overcounted; qty_remaining corrected to match user's report, historical meal_usage left as-is"
 B013,Red Onions,2026-07-12,Publix,1.10,lb,3.07,0,DEPLETED,user confirmed finished 2026-07-18 dinner (M0026) - resolves prior flag
 B014,Red Bell Peppers,2026-07-12,Publix,0.88,lb,2.99,0,DEPLETED,"green pepper/red pepper = this batch per established convention; user confirmed finished 2026-07-19 dinner (M0030) - corrects a prior (2026-07-18) note that had wrongly marked this DEPLETED based on an AI assumption rather than explicit user confirmation"
-B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,0.01,FUZZY,"Ragu - nearly empty, flagged for user confirmation"
+B015,Robusto 6 Cheese Pasta Sauce,2026-07-12,Presidente Supermarket,1,jar,4.69,-0.32,FUZZY,"Ragu - was already flagged nearly-empty (0.01) before 2026-07-21 dinner (M0037) used it again; now negative, likely needs replacing - flagged for user confirmation"
 B016,Red Delicious Apples,2026-07-12,Presidente Supermarket,2.17,lb,1.99,0.85,FUZZY,
-B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.25,FUZZY,La Fe
-B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,0.30,FUZZY,Tropical - fuzzy item
+B017,Rigatoni Pasta,2026-07-12,Presidente Supermarket,1,box,2.29,0.15,FUZZY,"La Fe; estimate hit exactly 0 as of 2026-07-21 dinner (M0037), but user confirmed 2026-07-22 it's not finished - portion estimates were running high, qty_remaining bumped back up to a modest positive amount pending a firmer read"
+B018,Shredded Mexican Cheese,2026-07-12,Presidente Supermarket,1,bag,2.99,0.10,FUZZY,Tropical - fuzzy item
 B019,XL White Eggs,2026-07-12,Presidente Supermarket,18,ct,0.22,0,DEPLETED,"Sunup - 18ct; user confirmed finished 2026-07-18 breakfast (M0024). FIFO estimate said ~2ct should have remained - discrepancy flagged, possibly an uncounted use or miscount"
 B020,Basmati Rice,2026-07-12,Amazon,1,bag,3.97,0.40,FUZZY,Mahatma 32oz - fuzzy item
-B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,1.60,FUZZY,Skippy 26.5oz Pack of 2 - fuzzy item
+B021,Natural Creamy Peanut Butter,2026-07-12,Amazon,2,jar,3.74,1.50,FUZZY,Skippy 26.5oz Pack of 2 - fuzzy item
 B022,Mint Choc Chip Ice Cream,2026-07-13,Publix,1,tub,6.19,0.85,FUZZY,
-B023,Cereal,2026-07-13,Publix,1,box,2.78,0.75,FUZZY,
-B024,Cookies,2026-07-13,Publix,24,ct,0.25,17,OPEN,24 pack
-B027,XL White Eggs,2026-07-18,Publix,18,ct,0.23,18,OPEN,
-B028,Chicken Thigh Fillets,2026-07-16,GoPuff,1.82,lb,3.41,1.82,FUZZY,Sanderson Farms - price prorated for order discount
-B029,Organic Baby Spinach,2026-07-16,GoPuff,1,bag,3.10,0.50,FUZZY,5oz - price prorated for order discount
-B030,Banana,2026-07-16,GoPuff,4,ct,0.31,2,FUZZY,"price prorated for order discount; qty_remaining reflects M0020 (1ct) + M0025 (1ct), previously misattributed to a duplicate placeholder batch (removed 2026-07-18)"
-B031,Milk 2% Reduced Fat,2026-07-16,GoPuff,1,bottle,4.09,1,FUZZY,Fairlife 52oz - price prorated for order discount
+B023,Cereal,2026-07-13,Publix,1,box,2.78,0.50,FUZZY,
+B024,Cookies,2026-07-13,Publix,24,ct,0.25,16,OPEN,24 pack
+B027,XL White Eggs,2026-07-18,Publix,18,ct,0.23,12,OPEN,
+B028,Chicken Thigh Fillets,2026-07-16,GoPuff,1.82,lb,3.41,1.52,FUZZY,"Sanderson Farms - price prorated for order discount; first use 2026-07-21 dinner (M0037), user-confirmed as the chicken source over B002"
+B029,Organic Baby Spinach,2026-07-16,GoPuff,1,bag,3.10,0.10,FUZZY,5oz - price prorated for order discount
+B030,Banana,2026-07-16,GoPuff,4,ct,0.31,0,FUZZY,"price prorated for order discount; qty_remaining reflects M0020 (1ct) + M0025 (1ct), previously misattributed to a duplicate placeholder batch (removed 2026-07-18); used again M0033 (1ct) and M0036 (1ct) - estimate hit exactly 0 as of 2026-07-21, flagged for user confirmation"
+B031,Milk 2% Reduced Fat,2026-07-16,GoPuff,1,bottle,4.09,0.85,FUZZY,Fairlife 52oz - price prorated for order discount
 B032,Oreo Sandwich Cookies,2026-07-16,GoPuff,1,bag,4.71,0,DEPLETED,"13.29oz - price prorated for order discount; qty_remaining reflects M0019 (0.25 bag) + M0023 (0.25 bag) + M0027 (0.25 bag) + M0031 (0.25 bag); user confirmed finished 2026-07-20"
-B033,Yellow Onion,2026-07-16,GoPuff,1,ct,0.61,0.85,FUZZY,price prorated for order discount
+B033,Yellow Onion,2026-07-16,GoPuff,1,ct,0.61,0.65,FUZZY,price prorated for order discount
 B034,Mexican Four Cheese Blend,2026-07-16,GoPuff,2,bag,2.23,2,FUZZY,Essential Everyday 8oz x2 - price prorated for order discount
