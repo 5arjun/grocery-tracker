@@ -152,3 +152,36 @@ M0037,B018,Shredded Mexican Cheese,0.1,bag,yes,
 M0037,B028,Chicken Thigh Fillets,0.3,lb,yes,user confirmed - first use of this batch; B003 (usual pasta chicken) depleted
 M0038,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
 M0038,B023,Cereal,0.25,box,yes,
+M0039,B027,XL White Eggs,3,ct,no,
+M0039,B033,Yellow Onion,0.1,ct,yes,
+M0039,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,already-negative estimate continuing per Rule 1
+M0039,B018,Shredded Mexican Cheese,0.1,bag,yes,last of this batch - brings to exactly 0
+M0039,B029,Organic Baby Spinach,0.2,bag,yes,brings estimate negative
+M0040,B008,Mandarins,1,ct,yes,
+M0040,B034,Mexican Four Cheese Blend,0.1,bag,yes,"first use of this batch - B018 confirmed done by user, one of B034's two bags now opened"
+M0040,B007,Baby Cut Carrots,0.15,bag,yes,already-negative estimate continuing per Rule 1
+M0041,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0041,B024,Cookies,1,ct,no,
+M0042,B012,Plain Bagels,1,ct,no,last of batch - user confirmed 'no more'
+M0042,B005,Whipped Cream Cheese,0.15,tub,yes,
+M0042,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0043,B007,Baby Cut Carrots,0.15,bag,yes,already-negative estimate continuing per Rule 1
+M0043,B008,Mandarins,2,ct,yes,
+M0044,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0044,B024,Cookies,1,ct,no,
+M0045,B027,XL White Eggs,3,ct,no,
+M0045,B033,Yellow Onion,0.1,ct,yes,
+M0045,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,already-negative estimate continuing per Rule 1
+M0045,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0046,B008,Mandarins,2,ct,yes,
+M0046,B035,Plain Bagels,1,ct,no,new batch from 2026-07-24 receipt
+M0046,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0046,B005,Whipped Cream Cheese,0.15,tub,yes,
+M0047,B011,Burrito Tortillas,1,ct,no,
+M0047,B028,Chicken Thigh Fillets,0.3,lb,yes,"B002 wasted today (see waste.csv) - meal chicken continues from B028"
+M0047,B033,Yellow Onion,0.1,ct,yes,
+M0047,B043,Red Bell Peppers,0.1,lb,yes,new batch from 2026-07-24 receipt - B014 already depleted
+M0047,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0047,B041,Black Beans,0.4,can,yes,first use of this new item/batch
+M0048,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0048,B024,Cookies,1,ct,no,

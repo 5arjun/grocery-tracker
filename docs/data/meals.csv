@@ -37,3 +37,13 @@ M0035,2026-07-21,breakfast,"3 eggs, onions, cottage cheese, spinach",1.96,onion 
 M0036,2026-07-21,lunch,"banana, peanut butter, 2 mandarins, carrots",2.03,banana use brings batch B030 to exactly 0
 M0037,2026-07-21,dinner,"pasta, chicken, pasta sauce, garlic paste, onions, frozen peppers, spinach, cheese",5.34,"chicken drawn from B028 (chicken thigh fillets) per user confirmation - B003 (usual pasta chicken) depleted; pasta sauce (B015) was already near-empty (0.01 remaining) and is now negative - batch likely needs replacing soon"
 M0038,2026-07-21,snack,"milk, cereal",1.31,milk drawn from B031 (2% reduced fat) since B004 closed out this same day
+M0039,2026-07-22,breakfast,"3 eggs, onions, cottage cheese, cheese, spinach",2.26,"cheese = last of B018 (Shredded Mexican Cheese), which the user confirmed was finished at lunch today"
+M0040,2026-07-22,lunch,"mandarin, cheese, carrots",1.18,"cheese switches to B034 (Mexican Four Cheese Blend) - user reported B018 (""first original bag"") is done, opened one of B034's two bags, one bag still unopened; 7-Eleven ($2.29) logged separately as outside food"
+M0041,2026-07-22,snack,"ice cream, cookies",1.18,"dinner (Chipotle + chocolate milk) was fully outside food, logged separately - no home meal row for dinner today"
+M0042,2026-07-23,breakfast,"bagel (last one), cream cheese, peanut butter",1.82,"user confirmed 'no more' bagels after this - batch B012 closed out"
+M0043,2026-07-23,lunch,"carrots, 2 mandarins",1.35,
+M0044,2026-07-23,dinner,"ice cream, cookies",1.18,Taco Bell ($8.00) logged separately as outside food
+M0045,2026-07-24,breakfast,"3 eggs, onions, cottage cheese, cheese",1.56,"cheese from B034; coffee ($9.00) logged separately as outside food"
+M0046,2026-07-24,lunch,"2 mandarins, bagel, peanut butter, creme cheese",2.59,"bagel drawn from new batch B035 (Plain Bagels, from today's Publix receipt) - assumed plain per usual convention since flavor wasn't specified"
+M0047,2026-07-24,dinner,"tortilla, chicken, onions, red bell peppers, cheese, black beans",2.55,"chicken drawn from B028 (Chicken Thigh Fillets) - B002 (rotisserie chicken) was wasted today, see waste.csv; red bell peppers from new batch B043 (today's receipt) since B014 was already depleted; black beans is a new item, first use, drawn from B041"
+M0048,2026-07-24,snack,"ice cream, cookies",1.18,"""food"" ($14.98) and ""drinks"" ($7.04) logged separately as outside food; bar ($15.65) logged to fun.csv"
