@@ -51,6 +51,16 @@
           <span class="tile__sub" id="kpi-outside-food-sub"></span>
         </div>
         <div class="tile">
+          <span class="tile__label">Fun spend</span>
+          <span class="tile__value" id="kpi-fun-spend">—</span>
+          <span class="tile__sub" id="kpi-fun-spend-sub"></span>
+        </div>
+        <div class="tile">
+          <span class="tile__label">All-time Miami spend</span>
+          <span class="tile__value" id="kpi-all-spend">—</span>
+          <span class="tile__sub" id="kpi-all-spend-sub"></span>
+        </div>
+        <div class="tile">
           <span class="tile__label">Avg / day</span>
           <span class="tile__value" id="kpi-avg-day">—</span>
           <span class="tile__sub" id="kpi-avg-day-sub"></span>
@@ -116,8 +126,8 @@
       <div class="charts">
         <div class="card">
           <div class="card__head">
-            <h3>Daily food spend</h3>
-            <p class="card__sub">Groceries vs. outside food, per day</p>
+            <h3>Daily spend</h3>
+            <p class="card__sub">Groceries, outside food, and fun — per day</p>
           </div>
           <div class="card__body">
             <div class="chart-box"><canvas id="chart-dailyspend"></canvas></div>
@@ -127,8 +137,8 @@
 
         <div class="card">
           <div class="card__head">
-            <h3>Cumulative food spend</h3>
-            <p class="card__sub">Running total, groceries + outside food</p>
+            <h3>Cumulative all-time spend</h3>
+            <p class="card__sub">Running total, groceries + outside food + fun</p>
           </div>
           <div class="card__body">
             <div class="chart-box"><canvas id="chart-cumulative"></canvas></div>
@@ -178,6 +188,17 @@
 
         <div class="card">
           <div class="card__head">
+            <h3>Top stores by spend</h3>
+            <p class="card__sub">Where your grocery dollars went, by store</p>
+          </div>
+          <div class="card__body">
+            <div class="chart-box"><canvas id="chart-stores"></canvas></div>
+            <p class="empty" id="empty-stores" hidden>No purchases logged yet.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
             <h3>Avg cost by meal type</h3>
             <p class="card__sub">Home-cooked meals, estimated cost</p>
           </div>
@@ -217,7 +238,7 @@
       <h2 class="section-title">Recent activity</h2>
       <div class="tables">
         <div class="card card--wide">
-          <div class="card__head"><p class="card__sub">Purchases, meals, outside food &amp; waste, newest first</p></div>
+          <div class="card__head"><p class="card__sub">Purchases, meals, outside food, fun &amp; waste, newest first</p></div>
           <div class="card__body" id="table-activity"></div>
         </div>
       </div>

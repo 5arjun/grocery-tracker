@@ -547,6 +547,7 @@ td.num, th.num {
 .activity-icon-chip--meal    { background: color-mix(in srgb, var(--series-2) 16%, transparent); color: var(--series-2); }
 .activity-icon-chip--outside { background: color-mix(in srgb, var(--series-6) 16%, transparent); color: var(--series-6); }
 .activity-icon-chip--waste   { background: color-mix(in srgb, var(--status-critical) 14%, transparent); color: var(--status-critical); }
+.activity-icon-chip--fun     { background: color-mix(in srgb, var(--series-5) 16%, transparent); color: var(--series-5); }
 .activity-main {
   display: flex;
   flex-direction: column;

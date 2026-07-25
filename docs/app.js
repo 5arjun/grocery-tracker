@@ -11,6 +11,7 @@ const CSV_FILES = {
   waste:      "data/waste.csv",
   inventory:  "data/inventory.csv",
   outsideFood: "data/outside_food.csv",
+  fun:        "data/fun.csv",
 };
 
 const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack"];
@@ -86,6 +87,7 @@ const ICONS = {
   outside: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 8Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
   waste: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+  fun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14l-6.5 8.5v6l3 1.5h-7l3-1.5v-6z"/></svg>',
 };
 
 function esc(s) {
@@ -115,7 +117,7 @@ async function loadCsv(path) {
 /* ---- stat computation --------------------------------------------- */
 
 function computeStats(data) {
-  const { purchases, meals, mealUsage, waste, inventory, outsideFood } = data;
+  const { purchases, meals, mealUsage, waste, inventory, outsideFood, fun } = data;
 
   // --- purchases / trips ---
   const totalSpent = purchases.reduce((s, r) => s + n0(r.total_price), 0);
@@ -131,7 +133,15 @@ function computeStats(data) {
   const foodTotal = totalSpent + outsideFoodTotal;
   const outsideFoodPct = foodTotal > 0 ? (outsideFoodTotal / foodTotal) * 100 : 0;
 
-  // daily spend, groceries vs outside food
+  // --- fun (bars, rides, nights out — non-food discretionary spend) ---
+  const funTotal = fun.reduce((s, r) => s + n0(r.cost), 0);
+  const hasFun = fun.length > 0;
+
+  // --- all-time spend across every tracked dollar: groceries + eating out + fun ---
+  const allSpendTotal = totalSpent + outsideFoodTotal + funTotal;
+  const hasAnySpend = totalSpent > 0 || outsideFoodTotal > 0 || funTotal > 0;
+
+  // daily spend, groceries vs outside food vs fun
   const groceriesByDate = new Map();
   for (const r of purchases) {
     const d = (r.date || "").trim();
@@ -144,11 +154,18 @@ function computeStats(data) {
     if (!d) continue;
     outsideByDate.set(d, (outsideByDate.get(d) || 0) + n0(r.cost));
   }
-  const allSpendDates = new Set([...groceriesByDate.keys(), ...outsideByDate.keys()]);
+  const funByDate = new Map();
+  for (const r of fun) {
+    const d = (r.date || "").trim();
+    if (!d) continue;
+    funByDate.set(d, (funByDate.get(d) || 0) + n0(r.cost));
+  }
+  const allSpendDates = new Set([...groceriesByDate.keys(), ...outsideByDate.keys(), ...funByDate.keys()]);
   const dailySpend = [...allSpendDates].sort().map((date) => ({
     date,
     groceries: groceriesByDate.get(date) || 0,
     outside: outsideByDate.get(date) || 0,
+    fun: funByDate.get(date) || 0,
   }));
 
   // top items by cost
@@ -160,6 +177,18 @@ function computeStats(data) {
   }
   const topItemsByCost = [...costByItem.entries()]
     .map(([item, total]) => ({ item, total }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 6);
+
+  // top stores by grocery spend — `store` is tracked per purchase but wasn't aggregated anywhere
+  const costByStore = new Map();
+  for (const r of purchases) {
+    const store = (r.store || "").trim();
+    if (!store) continue;
+    costByStore.set(store, (costByStore.get(store) || 0) + n0(r.total_price));
+  }
+  const topStoresByCost = [...costByStore.entries()]
+    .map(([store, total]) => ({ store, total }))
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
 
@@ -175,10 +204,10 @@ function computeStats(data) {
     .map(([category, total]) => ({ category, total, pct: totalSpent > 0 ? (total / totalSpent) * 100 : 0 }))
     .sort((a, b) => b.total - a.total);
 
-  // cumulative food spend (groceries + outside food), running total by date
+  // cumulative all-time spend (groceries + outside food + fun), running total by date
   let running = 0;
   const cumulativeSpend = [...allSpendDates].sort().map((date) => {
-    running += (groceriesByDate.get(date) || 0) + (outsideByDate.get(date) || 0);
+    running += (groceriesByDate.get(date) || 0) + (outsideByDate.get(date) || 0) + (funByDate.get(date) || 0);
     return { date, total: running };
   });
 
@@ -350,6 +379,15 @@ function computeStats(data) {
       sortKey: r.batch_id || "",
     });
   }
+  for (const r of fun) {
+    activity.push({
+      date: (r.date || "").trim(),
+      type: "fun",
+      title: r.description || "Fun",
+      amount: n0(r.cost),
+      sortKey: `${r.date}-${r.description}`,
+    });
+  }
   activity.sort((a, b) => {
     const d = String(b.date).localeCompare(String(a.date));
     if (d !== 0) return d;
@@ -358,10 +396,12 @@ function computeStats(data) {
 
   return {
     totalSpent, totalTrips, avgSpendPerTrip, dailySpend, cumulativeSpend, topItemsByCost,
-    spendByCategory,
+    spendByCategory, topStoresByCost,
     totalMeals, avgCostPerMeal, avgByMealType, mealsPerTrip, itemBreakdown,
     totalWaste, wastePct, hasWaste,
     outsideFoodTotal, hasOutsideFood, foodTotal, outsideFoodPct,
+    funTotal, hasFun, funEventsCount: fun.length,
+    allSpendTotal, hasAnySpend,
     outsideAvgPerEvent, canCompareMealCost, eatingOutMultiplier, moneySaved,
     avgSpendPerDay, projectedMonthlySpend, daysTrackedCount,
     activeInventory, activeInventoryMoreCount, lowStockCount, dateRangeLabel,
@@ -381,6 +421,14 @@ function renderKpis(s) {
 
   set("kpi-outside-food", s.hasOutsideFood ? fmtMoney0(s.outsideFoodTotal) : "—");
   set("kpi-outside-food-sub", s.hasOutsideFood ? `${fmtPct(s.outsideFoodPct)} of food $` : "");
+
+  set("kpi-fun-spend", s.hasFun ? fmtMoney0(s.funTotal) : "—");
+  set("kpi-fun-spend-sub", s.hasFun ? `${s.funEventsCount} event${s.funEventsCount === 1 ? "" : "s"}` : "");
+
+  set("kpi-all-spend", s.hasAnySpend ? fmtMoney0(s.allSpendTotal) : "—");
+  set("kpi-all-spend-sub", s.hasAnySpend
+    ? `${fmtMoney0(s.totalSpent)} groceries + ${fmtMoney0(s.outsideFoodTotal)} eating out + ${fmtMoney0(s.funTotal)} fun`
+    : "");
 
   set("kpi-avg-day", s.daysTrackedCount ? fmtMoney(s.avgSpendPerDay) : "—");
   set("kpi-avg-day-sub", s.daysTrackedCount ? `≈${fmtMoney0(s.projectedMonthlySpend)} / 30 days` : "");
@@ -517,6 +565,7 @@ function renderDailySpendChart(s) {
   if (!toggleChart("chart-dailyspend", "empty-dailyspend", s.dailySpend.length > 0)) return;
   const c1 = token("--series-1");
   const c2 = token("--series-2");
+  const c3 = token("--series-5");
   charts.dailyspend = new Chart(document.getElementById("chart-dailyspend"), {
     type: "bar",
     data: {
@@ -532,6 +581,12 @@ function renderDailySpendChart(s) {
           label: "Outside food",
           data: s.dailySpend.map((d) => d.outside),
           backgroundColor: c2,
+          borderRadius: 4, maxBarThickness: 40, stack: "spend",
+        },
+        {
+          label: "Fun",
+          data: s.dailySpend.map((d) => d.fun),
+          backgroundColor: c3,
           borderRadius: 4, maxBarThickness: 40, stack: "spend",
         },
       ],
@@ -594,6 +649,38 @@ function renderTopItemsChart(s) {
       labels: s.topItemsByCost.map((d) => d.item),
       datasets: [{
         data: s.topItemsByCost.map((d) => d.total),
+        backgroundColor: c1,
+        borderRadius: 4, borderSkipped: "start",
+        maxBarThickness: 24,
+      }],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { right: 56 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.x) } },
+        valueLabels: { formatter: fmtMoney },
+      },
+      scales: baseScales({
+        x: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
+        y: { grid: { display: false } },
+      }),
+    },
+    plugins: [valueLabelPlugin],
+  });
+}
+
+function renderStoresChart(s) {
+  if (!toggleChart("chart-stores", "empty-stores", s.topStoresByCost.length > 0)) return;
+  const c1 = token("--series-1");
+  charts.stores = new Chart(document.getElementById("chart-stores"), {
+    type: "bar",
+    data: {
+      labels: s.topStoresByCost.map((d) => d.store),
+      datasets: [{
+        data: s.topStoresByCost.map((d) => d.total),
         backgroundColor: c1,
         borderRadius: 4, borderSkipped: "start",
         maxBarThickness: 24,
@@ -917,6 +1004,7 @@ function renderAll() {
   renderCategoryChart(stats);
   renderSplitFoodChart(stats);
   renderTopItemsChart(stats);
+  renderStoresChart(stats);
   renderTables(CACHE, stats);
 }
 
