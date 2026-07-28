@@ -185,3 +185,33 @@ M0047,B034,Mexican Four Cheese Blend,0.1,bag,yes,
 M0047,B041,Black Beans,0.4,can,yes,first use of this new item/batch
 M0048,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
 M0048,B024,Cookies,1,ct,no,
+M0049,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0049,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0049,B008,Mandarins,1,ct,yes,
+M0050,B035,Plain Bagels,1,ct,no,
+M0050,B027,XL White Eggs,3,ct,no,
+M0050,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0050,B033,Yellow Onion,0.1,ct,yes,
+M0050,B043,Red Bell Peppers,0.1,lb,yes,
+M0051,B033,Yellow Onion,0.1,ct,yes,
+M0051,B043,Red Bell Peppers,0.1,lb,yes,
+M0051,B017,Rigatoni Pasta,0.15,box,yes,"user confirmed 'no more' - last of batch, closing out"
+M0051,B015,Robusto 6 Cheese Pasta Sauce,0.33,jar,yes,user confirmed 'no more' - closing out despite already-negative estimate
+M0051,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,"already deeply negative (-0.90) - continuing per Rule 1, flagged for confirmation"
+M0051,B010,Garlic Blend,0.15,pkg,yes,garlic paste
+M0051,B028,Chicken Thigh Fillets,0.3,lb,yes,user confirmed 'no more' - closing out batch
+M0052,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0052,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0053,B027,XL White Eggs,3,ct,no,brings batch to exactly 0
+M0053,B035,Plain Bagels,1,ct,no,
+M0053,B029,Organic Baby Spinach,0.2,bag,yes,already negative - continuing per Rule 1
+M0053,B006,Cottage Cheese Lowfat Pineapple,0.2,tub,yes,now at -1.30 - flagged for confirmation this batch is actually finished
+M0054,B011,Burrito Tortillas,1,ct,no,
+M0054,B045,Boneless Chicken Breast,0.25,pkg,yes,new batch from today's Publix receipt (T009) - resolves chicken gap left by B028
+M0054,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0054,B033,Yellow Onion,0.1,ct,yes,
+M0054,B043,Red Bell Peppers,0.1,lb,yes,
+M0054,B041,Black Beans,0.4,can,yes,
+M0054,B020,Basmati Rice,0.15,bag,yes,
+M0055,B008,Mandarins,1,ct,yes,
+M0055,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,

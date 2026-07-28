@@ -2,21 +2,21 @@ meal_id,date,meal_type,description,est_cost,notes
 M0001,2026-07-12,breakfast,eggs and cheese,0.74,
 M0002,2026-07-12,dinner,"pasta, chicken, garlic paste, onions, green pepper, pasta sauce",6.73,
 M0003,2026-07-12,snack,milk,0.82,
-M0004,2026-07-13,breakfast,"eggs, cottage cheese, onion, green pepper",1.65,
+M0004,2026-07-13,breakfast,"eggs, cottage cheese, onion, green pepper",1.31,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0005,2026-07-13,lunch,"bagel, green pepper, onion, cheese, chicken slices",3.40,chicken-slice portion revised down 2026-07-18 (see M0024 override)
-M0006,2026-07-13,dinner,"tortilla, chicken, frozen peppers, onions, rice, cheese, cottage cheese",6.16,
+M0006,2026-07-13,dinner,"tortilla, chicken, frozen peppers, onions, rice, cheese, cottage cheese",5.82,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0007,2026-07-13,snack,"2 mandarins, apple, carrots, milk",3.01,
-M0008,2026-07-14,breakfast,"3 eggs, onion, green pepper, cottage cheese",1.87,
+M0008,2026-07-14,breakfast,"3 eggs, onion, green pepper, cottage cheese",1.53,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0009,2026-07-14,lunch,bagel and cream cheese,1.44,
 M0010,2026-07-14,dinner,"pasta, pasta sauce, chicken, garlic paste, onion, green pepper",6.73,
 M0011,2026-07-14,snack,"carrots, mandarin, apple, ice cream, 2 cookies",3.23,
-M0012,2026-07-15,breakfast,"3 eggs, cottage cheese, onions, red peppers, chicken slices",2.74,chicken-slice portion revised down 2026-07-18 (see M0024 override)
+M0012,2026-07-15,breakfast,"3 eggs, cottage cheese, onions, red peppers, chicken slices",2.40,"chicken-slice portion revised down 2026-07-18 (see M0024 override); cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0013,2026-07-15,lunch,"carrots, 2 mandarins, peanut butter",1.91,
 M0014,2026-07-15,dinner,"bagel, chicken slices, onions, red peppers, cheese, salad",4.58,chicken-slice portion revised down 2026-07-18 (see M0024 override)
 M0015,2026-07-15,snack,milk and cereal,1.51,
 M0016,2026-07-16,breakfast,"apple and peanut butter",1.03,
-M0017,2026-07-16,lunch,"3 eggs, onions, red peppers, cottage cheese",1.64,
-M0018,2026-07-16,dinner,"tortilla, frozen veggies, onions, chicken, cheese, cottage cheese, rice",5.42,
+M0017,2026-07-16,lunch,"3 eggs, onions, red peppers, cottage cheese",1.30,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
+M0018,2026-07-16,dinner,"tortilla, frozen veggies, onions, chicken, cheese, cottage cheese, rice",5.17,"cottage cheese (B006) reconciled to $0.19 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0019,2026-07-16,snack,"carrots, mandarin, 2 cookies, milk, oreos",3.65,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0020,2026-07-17,breakfast,"banana and peanut butter",0.68,
 M0021,2026-07-17,lunch,"bagel, creme cheese, cookie, carrots",2.26,
@@ -28,22 +28,29 @@ M0026,2026-07-18,dinner,"chicken, salad, rice, green peppers, onions",3.91,"onio
 M0027,2026-07-18,snack,"oreos, milk, cookie",2.25,
 M0028,2026-07-19,breakfast,apple and peanut butter,1.03,
 M0029,2026-07-19,lunch,"bagel, chicken slices, cheese",2.40,chicken slices drawn from B002 (deli rotisserie chicken)
-M0030,2026-07-19,dinner,"chicken, tortilla, red pepper (finished), onion, cheese, rice, cottage cheese, spinach",3.89,"red pepper = red bell peppers (batch B014), user confirmed finished today - corrects a wrong 7/18 closure of this same batch (see inventory note); chicken continues from B002 (deli rotisserie) per FIFO since B003 depleted; onion drawn from batch B033 (yellow onion) per user's ""from new onion"""
+M0030,2026-07-19,dinner,"chicken, tortilla, red pepper (finished), onion, cheese, rice, cottage cheese, spinach",3.64,"red pepper = red bell peppers (batch B014), user confirmed finished today - corrects a wrong 7/18 closure of this same batch (see inventory note); chicken continues from B002 (deli rotisserie) per FIFO since B003 depleted; onion drawn from batch B033 (yellow onion) per user's ""from new onion""; cottage cheese (B006) reconciled to $0.19 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0031,2026-07-19,snack,"oreos, cookie, milk",2.25,
 M0032,2026-07-20,breakfast,"3 eggs, cheese",0.99,
 M0033,2026-07-20,lunch,"bagel, creme cheese, banana",1.75,bagel use brings batch B012 to exactly 0 - flagged for confirmation
 M0034,2026-07-20,snack,"carrots, milk (finished first one), cookies",1.37,"milk = batch B004, user confirmed finished - closing out batch"
-M0035,2026-07-21,breakfast,"3 eggs, onions, cottage cheese, spinach",1.96,onion drawn from B033 (yellow onion) - only open onion batch
+M0035,2026-07-21,breakfast,"3 eggs, onions, cottage cheese, spinach",1.62,"onion drawn from B033 (yellow onion) - only open onion batch; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0036,2026-07-21,lunch,"banana, peanut butter, 2 mandarins, carrots",2.03,banana use brings batch B030 to exactly 0
 M0037,2026-07-21,dinner,"pasta, chicken, pasta sauce, garlic paste, onions, frozen peppers, spinach, cheese",5.34,"chicken drawn from B028 (chicken thigh fillets) per user confirmation - B003 (usual pasta chicken) depleted; pasta sauce (B015) was already near-empty (0.01 remaining) and is now negative - batch likely needs replacing soon"
 M0038,2026-07-21,snack,"milk, cereal",1.31,milk drawn from B031 (2% reduced fat) since B004 closed out this same day
-M0039,2026-07-22,breakfast,"3 eggs, onions, cottage cheese, cheese, spinach",2.26,"cheese = last of B018 (Shredded Mexican Cheese), which the user confirmed was finished at lunch today"
+M0039,2026-07-22,breakfast,"3 eggs, onions, cottage cheese, cheese, spinach",1.92,"cheese = last of B018 (Shredded Mexican Cheese), which the user confirmed was finished at lunch today; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0040,2026-07-22,lunch,"mandarin, cheese, carrots",1.18,"cheese switches to B034 (Mexican Four Cheese Blend) - user reported B018 (""first original bag"") is done, opened one of B034's two bags, one bag still unopened; 7-Eleven ($2.29) logged separately as outside food"
 M0041,2026-07-22,snack,"ice cream, cookies",1.18,"dinner (Chipotle + chocolate milk) was fully outside food, logged separately - no home meal row for dinner today"
 M0042,2026-07-23,breakfast,"bagel (last one), cream cheese, peanut butter",1.82,"user confirmed 'no more' bagels after this - batch B012 closed out"
 M0043,2026-07-23,lunch,"carrots, 2 mandarins",1.35,
 M0044,2026-07-23,dinner,"ice cream, cookies",1.18,Taco Bell ($8.00) logged separately as outside food
-M0045,2026-07-24,breakfast,"3 eggs, onions, cottage cheese, cheese",1.56,"cheese from B034; coffee ($9.00) logged separately as outside food"
+M0045,2026-07-24,breakfast,"3 eggs, onions, cottage cheese, cheese",1.22,"cheese from B034; coffee ($9.00) logged separately as outside food; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0046,2026-07-24,lunch,"2 mandarins, bagel, peanut butter, creme cheese",2.59,"bagel drawn from new batch B035 (Plain Bagels, from today's Publix receipt) - assumed plain per usual convention since flavor wasn't specified"
 M0047,2026-07-24,dinner,"tortilla, chicken, onions, red bell peppers, cheese, black beans",2.55,"chicken drawn from B028 (Chicken Thigh Fillets) - B002 (rotisserie chicken) was wasted today, see waste.csv; red bell peppers from new batch B043 (today's receipt) since B014 was already depleted; black beans is a new item, first use, drawn from B041"
 M0048,2026-07-24,snack,"ice cream, cookies",1.18,"""food"" ($14.98) and ""drinks"" ($7.04) logged separately as outside food; bar ($15.65) logged to fun.csv"
+M0049,2026-07-25,breakfast,"apple, peanut butter, mandarin",1.42,
+M0050,2026-07-25,lunch,"bagel, 3 eggs, cheese, onions, red peppers",2.19,
+M0051,2026-07-25,dinner,"onions, red peppers, pasta (no more), pasta sauce (no more), cottage cheese, garlic paste, chicken (no more)",4.29,"user confirmed pasta (B017), pasta sauce (B015), and chicken (B028) all finished - closed out all three batches; also confirmed cookies (B024) ran out yesterday (7/24), closed out; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
+M0052,2026-07-27,breakfast,"apple, peanut butter",1.03,
+M0053,2026-07-27,lunch,"3 eggs, bagel, spinach, cottage cheese",2.53,"eggs (B027) confirmed ran out - user bought more (B046, unused); cottage cheese (B006) reconciled to $0.30 share - user confirmed batch finished, total cost spread across all uses"
+M0054,2026-07-27,dinner,"tortilla, chicken, cheese, onions, red peppers, beans, rice",3.27,"chicken drawn from new batch B045 (Springer Mountain Farms Boneless Chicken Breast, today's Publix receipt T009) - resolves the gap left by B028 closing out on 2026-07-25"
+M0055,2026-07-27,snack,"mandarin, icecream",1.32,
