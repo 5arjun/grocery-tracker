@@ -215,3 +215,58 @@ M0054,B041,Black Beans,0.4,can,yes,
 M0054,B020,Basmati Rice,0.15,bag,yes,
 M0055,B008,Mandarins,1,ct,yes,
 M0055,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0056,B046,Large Eggs,3,ct,no,
+M0056,B037,Cottage Cheese Lowfat,0.15,tub,yes,new batch - B006 confirmed finished
+M0056,B041,Black Beans,0.2,can,yes,
+M0056,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0057,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0057,B035,Plain Bagels,1,ct,no,
+M0057,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0057,B005,Whipped Cream Cheese,0.15,tub,yes,last use - batch confirmed finished by user
+M0057,B008,Mandarins,2,ct,yes,
+M0058,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
+M0058,B023,Cereal,0.25,box,yes,
+M0059,B046,Large Eggs,3,ct,no,
+M0059,B043,Red Bell Peppers,0.1,lb,yes,
+M0059,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0059,B041,Black Beans,0.2,can,yes,
+M0060,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0060,B008,Mandarins,1,ct,yes,
+M0061,B045,Boneless Chicken Breast,0.25,pkg,yes,
+M0061,B033,Yellow Onion,0.1,ct,yes,
+M0061,B043,Red Bell Peppers,0.1,lb,yes,
+M0061,B041,Black Beans,0.2,can,yes,"user confirmed 'finished' - last of batch, closing out"
+M0061,B039,Chickpeas,0.4,can,yes,first use of this item/batch
+M0061,B020,Basmati Rice,0.15,bag,yes,
+M0062,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0062,B035,Plain Bagels,1,ct,no,
+M0062,B048,Cream Cheese,0.15,tub,yes,first use of this new batch - B005 closed out
+M0063,B046,Large Eggs,3,ct,no,
+M0063,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0064,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0064,B008,Mandarins,2,ct,yes,
+M0065,B045,Boneless Chicken Breast,0.25,pkg,yes,
+M0065,B050,Rigatoni Pasta,0.25,box,yes,first use of this new batch - user noted 'new box'
+M0065,B033,Yellow Onion,0.1,ct,yes,
+M0065,B043,Red Bell Peppers,0.1,lb,yes,
+M0065,B049,Traditional Pasta Sauce,0.33,jar,yes,first use of this new batch
+M0065,B010,Garlic Blend,0.15,pkg,yes,garlic paste
+M0066,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
+M0067,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
+M0067,B023,Cereal,0.25,box,yes,
+M0068,B046,Large Eggs,3,ct,no,brings batch to exactly 0 - flagged for confirmation
+M0068,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0068,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0068,B008,Mandarins,2,ct,yes,
+M0069,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
+M0069,B023,Cereal,0.25,box,yes,
+M0070,B046,Large Eggs,3,ct,no,"brings estimate negative (-3) - flagged for confirmation, real discrepancy since eggs are exact-count"
+M0070,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0070,B033,Yellow Onion,0.1,ct,yes,
+M0070,B043,Red Bell Peppers,0.1,lb,yes,
+M0070,B039,Chickpeas,0.4,can,yes,
+M0071,B045,Boneless Chicken Breast,0.25,pkg,yes,brings batch to exactly 0 - flagged for confirmation
+M0071,B039,Chickpeas,0.4,can,yes,
+M0071,B033,Yellow Onion,0.1,ct,yes,
+M0071,B043,Red Bell Peppers,0.1,lb,yes,green pepper = red bell peppers
+M0071,B020,Basmati Rice,0.15,bag,yes,

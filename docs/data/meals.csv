@@ -7,7 +7,7 @@ M0005,2026-07-13,lunch,"bagel, green pepper, onion, cheese, chicken slices",3.40
 M0006,2026-07-13,dinner,"tortilla, chicken, frozen peppers, onions, rice, cheese, cottage cheese",5.82,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0007,2026-07-13,snack,"2 mandarins, apple, carrots, milk",3.01,
 M0008,2026-07-14,breakfast,"3 eggs, onion, green pepper, cottage cheese",1.53,"cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
-M0009,2026-07-14,lunch,bagel and cream cheese,1.44,
+M0009,2026-07-14,lunch,bagel and cream cheese,1.50,"cream cheese (B005) reconciled to $0.58 share - batch confirmed finished 2026-07-28, total cost spread across all uses"
 M0010,2026-07-14,dinner,"pasta, pasta sauce, chicken, garlic paste, onion, green pepper",6.73,
 M0011,2026-07-14,snack,"carrots, mandarin, apple, ice cream, 2 cookies",3.23,
 M0012,2026-07-15,breakfast,"3 eggs, cottage cheese, onions, red peppers, chicken slices",2.40,"chicken-slice portion revised down 2026-07-18 (see M0024 override); cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
@@ -19,7 +19,7 @@ M0017,2026-07-16,lunch,"3 eggs, onions, red peppers, cottage cheese",1.30,"cotta
 M0018,2026-07-16,dinner,"tortilla, frozen veggies, onions, chicken, cheese, cottage cheese, rice",5.17,"cottage cheese (B006) reconciled to $0.19 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0019,2026-07-16,snack,"carrots, mandarin, 2 cookies, milk, oreos",3.65,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0020,2026-07-17,breakfast,"banana and peanut butter",0.68,
-M0021,2026-07-17,lunch,"bagel, creme cheese, cookie, carrots",2.26,
+M0021,2026-07-17,lunch,"bagel, creme cheese, cookie, carrots",2.32,"cream cheese (B005) reconciled to $0.58 share - batch confirmed finished 2026-07-28, total cost spread across all uses"
 M0022,2026-07-17,dinner,"pasta, pasta sauce, garlic paste, chicken, onions, frozen peppers",6.55,
 M0023,2026-07-17,snack,"2 mandarins, oreos, milk",2.78,"oreo portion recosted 2026-07-18: was using placeholder $7.59/bag, corrected to real prorated $4.71/bag (batch B032)"
 M0024,2026-07-18,breakfast,"tortilla, 3 eggs (last of batch - finished), spinach, onions, red peppers, chicken slices",3.31,eggs batch B019 confirmed finished by user; chicken-slice batch B002 corrected to ~half remaining per user report
@@ -31,7 +31,7 @@ M0029,2026-07-19,lunch,"bagel, chicken slices, cheese",2.40,chicken slices drawn
 M0030,2026-07-19,dinner,"chicken, tortilla, red pepper (finished), onion, cheese, rice, cottage cheese, spinach",3.64,"red pepper = red bell peppers (batch B014), user confirmed finished today - corrects a wrong 7/18 closure of this same batch (see inventory note); chicken continues from B002 (deli rotisserie) per FIFO since B003 depleted; onion drawn from batch B033 (yellow onion) per user's ""from new onion""; cottage cheese (B006) reconciled to $0.19 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0031,2026-07-19,snack,"oreos, cookie, milk",2.25,
 M0032,2026-07-20,breakfast,"3 eggs, cheese",0.99,
-M0033,2026-07-20,lunch,"bagel, creme cheese, banana",1.75,bagel use brings batch B012 to exactly 0 - flagged for confirmation
+M0033,2026-07-20,lunch,"bagel, creme cheese, banana",1.81,"bagel use brings batch B012 to exactly 0 - flagged for confirmation; cream cheese (B005) reconciled to $0.58 share - batch confirmed finished 2026-07-28, total cost spread across all uses"
 M0034,2026-07-20,snack,"carrots, milk (finished first one), cookies",1.37,"milk = batch B004, user confirmed finished - closing out batch"
 M0035,2026-07-21,breakfast,"3 eggs, onions, cottage cheese, spinach",1.62,"onion drawn from B033 (yellow onion) - only open onion batch; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0036,2026-07-21,lunch,"banana, peanut butter, 2 mandarins, carrots",2.03,banana use brings batch B030 to exactly 0
@@ -40,17 +40,33 @@ M0038,2026-07-21,snack,"milk, cereal",1.31,milk drawn from B031 (2% reduced fat)
 M0039,2026-07-22,breakfast,"3 eggs, onions, cottage cheese, cheese, spinach",1.92,"cheese = last of B018 (Shredded Mexican Cheese), which the user confirmed was finished at lunch today; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0040,2026-07-22,lunch,"mandarin, cheese, carrots",1.18,"cheese switches to B034 (Mexican Four Cheese Blend) - user reported B018 (""first original bag"") is done, opened one of B034's two bags, one bag still unopened; 7-Eleven ($2.29) logged separately as outside food"
 M0041,2026-07-22,snack,"ice cream, cookies",1.18,"dinner (Chipotle + chocolate milk) was fully outside food, logged separately - no home meal row for dinner today"
-M0042,2026-07-23,breakfast,"bagel (last one), cream cheese, peanut butter",1.82,"user confirmed 'no more' bagels after this - batch B012 closed out"
+M0042,2026-07-23,breakfast,"bagel (last one), cream cheese, peanut butter",1.88,"user confirmed 'no more' bagels after this - batch B012 closed out; cream cheese (B005) reconciled to $0.58 share - batch confirmed finished 2026-07-28, total cost spread across all uses"
 M0043,2026-07-23,lunch,"carrots, 2 mandarins",1.35,
 M0044,2026-07-23,dinner,"ice cream, cookies",1.18,Taco Bell ($8.00) logged separately as outside food
 M0045,2026-07-24,breakfast,"3 eggs, onions, cottage cheese, cheese",1.22,"cheese from B034; coffee ($9.00) logged separately as outside food; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
-M0046,2026-07-24,lunch,"2 mandarins, bagel, peanut butter, creme cheese",2.59,"bagel drawn from new batch B035 (Plain Bagels, from today's Publix receipt) - assumed plain per usual convention since flavor wasn't specified"
-M0047,2026-07-24,dinner,"tortilla, chicken, onions, red bell peppers, cheese, black beans",2.55,"chicken drawn from B028 (Chicken Thigh Fillets) - B002 (rotisserie chicken) was wasted today, see waste.csv; red bell peppers from new batch B043 (today's receipt) since B014 was already depleted; black beans is a new item, first use, drawn from B041"
+M0046,2026-07-24,lunch,"2 mandarins, bagel, peanut butter, creme cheese",2.66,"bagel drawn from new batch B035 (Plain Bagels, from today's Publix receipt) - assumed plain per usual convention since flavor wasn't specified; cream cheese (B005) reconciled to $0.58 share - batch confirmed finished 2026-07-28, total cost spread across all uses"
+M0047,2026-07-24,dinner,"tortilla, chicken, onions, red bell peppers, cheese, black beans",2.40,"chicken drawn from B028 (Chicken Thigh Fillets) - B002 (rotisserie chicken) was wasted today, see waste.csv; red bell peppers from new batch B043 (today's receipt) since B014 was already depleted; black beans is a new item, first use, drawn from B041; black beans (B041) reconciled to $0.37 share - batch confirmed finished 2026-07-29, total cost spread across all uses"
 M0048,2026-07-24,snack,"ice cream, cookies",1.18,"""food"" ($14.98) and ""drinks"" ($7.04) logged separately as outside food; bar ($15.65) logged to fun.csv"
 M0049,2026-07-25,breakfast,"apple, peanut butter, mandarin",1.42,
 M0050,2026-07-25,lunch,"bagel, 3 eggs, cheese, onions, red peppers",2.19,
 M0051,2026-07-25,dinner,"onions, red peppers, pasta (no more), pasta sauce (no more), cottage cheese, garlic paste, chicken (no more)",4.29,"user confirmed pasta (B017), pasta sauce (B015), and chicken (B028) all finished - closed out all three batches; also confirmed cookies (B024) ran out yesterday (7/24), closed out; cottage cheese (B006) reconciled to $0.25 share - batch confirmed finished 2026-07-27, total cost spread across all uses"
 M0052,2026-07-27,breakfast,"apple, peanut butter",1.03,
 M0053,2026-07-27,lunch,"3 eggs, bagel, spinach, cottage cheese",2.53,"eggs (B027) confirmed ran out - user bought more (B046, unused); cottage cheese (B006) reconciled to $0.30 share - user confirmed batch finished, total cost spread across all uses"
-M0054,2026-07-27,dinner,"tortilla, chicken, cheese, onions, red peppers, beans, rice",3.27,"chicken drawn from new batch B045 (Springer Mountain Farms Boneless Chicken Breast, today's Publix receipt T009) - resolves the gap left by B028 closing out on 2026-07-25"
+M0054,2026-07-27,dinner,"tortilla, chicken, cheese, onions, red peppers, beans, rice",3.12,"chicken drawn from new batch B045 (Springer Mountain Farms Boneless Chicken Breast, today's Publix receipt T009) - resolves the gap left by B028 closing out on 2026-07-25; black beans (B041) reconciled to $0.37 share - batch confirmed finished 2026-07-29, total cost spread across all uses"
 M0055,2026-07-27,snack,"mandarin, icecream",1.32,
+M0056,2026-07-28,breakfast,"3 eggs, cottage cheese (first tub finished), beans, cheese",1.99,"cottage cheese switches to new batch B037 (24oz) - B006 confirmed finished 2026-07-28; eggs from B046 (Large Eggs) since B027 closed; beans assumed = black beans (B041), continuing established convention where unqualified 'beans' has meant black beans"
+M0057,2026-07-28,lunch,"apple, bagel, peanut butter, cream cheese (finished, the berry one), 2 mandarins",3.31,"cream cheese (B005, Whipped Cream Cheese) confirmed finished today - reconciled total $3.49 cost across all uses (M0009, M0021, M0033, M0042, M0046, M0057); Cava $12 dinner logged separately as outside food"
+M0058,2026-07-28,snack,"milk, cereal",1.31,
+M0059,2026-07-29,breakfast,"3 eggs, red peppers, cottage cheese, beans",2.07,"beans assumed = black beans (B041)"
+M0060,2026-07-29,lunch,"apple, mandarin",1.05,
+M0061,2026-07-29,dinner,"chicken, onion, red pepper, beans (1 can finished), chickpeas, rice",2.81,"black beans (B041) confirmed finished by user - reconciled total $1.31 cost across all uses (M0047, M0054, M0056, M0059, M0061); chickpeas is a new item, first use, drawn from B039"
+M0062,2026-07-29,snack,"ice cream, bagel, cream cheese (the new one)",2.13,"cream cheese drawn from new batch B048 (Publix) - first use since B005 closed out; $9 food logged separately as outside food"
+M0063,2026-07-30,breakfast,"3 eggs, cottage cheese",1.58,
+M0064,2026-07-30,lunch,"apple, 2 mandarins",1.44,
+M0065,2026-07-30,dinner,"chicken, pasta (new box), onions, red peppers, pasta sauce, garlic paste",3.61,"pasta drawn from new batch B050 (first use, replaces closed B017, user noted 'new box'); pasta sauce drawn from new batch B049 (first use, replaces closed B015)"
+M0066,2026-07-30,snack,"ice cream",0.93,"$6 food and Dominos $7 logged separately as outside food"
+M0067,2026-07-31,breakfast,"milk, cereal",1.31,
+M0068,2026-07-31,lunch,"3 eggs, cottage cheese, cheese, 2 mandarins",2.59,"eggs (B046) usage brings estimate to exactly 0 - flagged for confirmation"
+M0069,2026-07-31,snack,"milk, cereal",1.31,"food truck $17 dinner and $7 food logged separately as outside food"
+M0070,2026-08-01,breakfast,"3 eggs, cottage cheese, onion, red pepper, chickpeas",2.46,"date assumed 2026-08-01 (Saturday) - user labeled both Friday and this day '7/31', treated as a typo since a day can't repeat; eggs (B046) usage now runs the estimate negative (-3) - flagging since eggs are an exact-count item, please confirm if more were bought or a prior count was off"
+M0071,2026-08-01,dinner,"chicken, chickpeas, onions, green peppers, rice",2.62,"chicken (B045) usage brings estimate to exactly 0 - flagged for confirmation; ice cream $13 and 7-Eleven $10 logged separately as outside food; Sky $14 logged to fun.csv"
