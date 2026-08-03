@@ -42,11 +42,20 @@ Column definitions and the rules for editing them live in
 
 ## The dashboard
 
-Open the live URL and you get:
+A dark-first, Linear-style app with five tabs (hash-routed, works as a phone
+web app with a bottom tab bar):
 
-- **KPI tiles** — grocery spend, outside food spend (% of total food $), avg cost per home-cooked meal, waste %, grocery trips, meals logged
-- **Charts** — daily spend (groceries vs. outside food, stacked), avg cost by meal type, groceries vs. outside food split, top items by cost, waste vs. grocery spend
-- **Tables** — item breakdown (cost + how often each item is used), inventory (open batches, lowest-remaining first), and a unified recent-activity feed mixing purchases, meals, outside food, and waste in one chronological list
+- **Overview** — all-time spend hero with a 14-day sparkline and week-over-week
+  delta, KPI tiles (groceries, outside food, fun, avg/day, waste %, cooking
+  streak, pantry value, low-stock alert), home-vs-out cost duel, recent activity
+- **Spending** — daily stacked spend with 7d/14d/all range control, cumulative
+  total, spend by weekday, grocery categories, stores, top items, **price watch**
+  (unit-price changes between repeat purchases), fun-money stats
+- **Meals** — cost-per-meal trend with 7-day average, GitHub-style cooking
+  calendar, avg cost by meal type, most-used ingredients, meal log
+- **Kitchen** — open batches with stock-level bars, pantry value, use-soon
+  spoilage watch, waste log
+- **Activity** — the full feed, filterable by type
 
 Everything is computed in the browser from the CSVs. With empty CSVs the page
 loads cleanly and shows a friendly "log your first receipt" state.

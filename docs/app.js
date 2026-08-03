@@ -1,43 +1,47 @@
 /* =====================================================================
-   Grocery Tracker — static dashboard
+   Grocery Tracker — Linear-style multi-tab dashboard
    Reads the CSVs under docs/data/, computes every stat in the browser,
-   and renders KPI tiles, charts, and tables. No build, no server code.
+   and renders five hash-routed views. No build, no server code.
    ===================================================================== */
 
 const CSV_FILES = {
-  purchases:  "data/purchases.csv",
-  meals:      "data/meals.csv",
-  mealUsage:  "data/meal_usage.csv",
-  waste:      "data/waste.csv",
-  inventory:  "data/inventory.csv",
+  purchases:   "data/purchases.csv",
+  meals:       "data/meals.csv",
+  mealUsage:   "data/meal_usage.csv",
+  waste:       "data/waste.csv",
+  inventory:   "data/inventory.csv",
   outsideFood: "data/outside_food.csv",
-  fun:        "data/fun.csv",
+  fun:         "data/fun.csv",
 };
 
+const VIEW_ORDER = ["overview", "spending", "meals", "kitchen", "activity"];
 const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack"];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Lightweight keyword classifier — the CSVs carry no category column, so this
 // infers one from the item name. Order matters: earlier rules win (e.g. "sauce"
 // must be checked before "cheese" so "Pasta Sauce" doesn't land in Dairy).
 const CATEGORY_RULES = [
   { name: "Protein", keywords: ["chicken", "beef", "turkey", "pork", "fish", "salmon", "shrimp", "tofu", "sausage", "bacon", "thigh", "breast"] },
-  { name: "Produce", keywords: ["carrot", "mandarin", "apple", "onion", "pepper", "spinach", "salad", "banana", "lettuce", "tomato", "orange", "grape", "berry", "potato", "cucumber", "fruit", "vegetable"] },
-  { name: "Grains & Pantry", keywords: ["pasta", "rice", "cereal", "bagel", "tortilla", "bread", "sauce", "garlic", "oil", "peanut butter", "jar", "flour", "oat"] },
+  { name: "Produce", keywords: ["carrot", "mandarin", "apple", "onion", "pepper", "spinach", "salad", "banana", "lettuce", "tomato", "orange", "grape", "berry", "potato", "cucumber", "fruit", "vegetable", "chickpea", "bean"] },
+  { name: "Grains & Pantry", keywords: ["pasta", "rice", "cereal", "bagel", "tortilla", "bread", "sauce", "garlic", "oil", "peanut butter", "jar", "flour", "oat", "seasoning"] },
   { name: "Dairy & Eggs", keywords: ["milk", "cheese", "egg", "yogurt"] },
   { name: "Snacks & Treats", keywords: ["cookie", "oreo", "ice cream", "chip", "candy", "chocolate", "cracker", "soda", "juice"] },
 ];
 const CATEGORY_OTHER = "Other";
 // Fixed name → color-slot mapping, independent of sort order — a category
 // keeps its color even if its rank by spend changes week to week.
-const CATEGORY_COLOR_SLOTS = {
-  "Protein": "--series-1",
-  "Produce": "--series-2",
-  "Grains & Pantry": "--series-3",
-  "Dairy & Eggs": "--series-4",
-  "Snacks & Treats": "--series-5",
-  [CATEGORY_OTHER]: "--series-6",
-};
+const CATEGORY_SLOTS = [
+  { name: "Protein",         token: "--series-1" },
+  { name: "Produce",         token: "--series-2" },
+  { name: "Grains & Pantry", token: "--series-3" },
+  { name: "Dairy & Eggs",    token: "--series-4" },
+  { name: "Snacks & Treats", token: "--series-5" },
+  { name: CATEGORY_OTHER,    token: "--series-6" },
+];
 function categorize(itemName) {
   const s = String(itemName || "").toLowerCase();
   for (const rule of CATEGORY_RULES) {
@@ -48,7 +52,6 @@ function categorize(itemName) {
 
 /* ---- tiny helpers -------------------------------------------------- */
 
-// Parse a numeric cell that may carry "$", ",", "%", "/unit", etc.
 function num(v) {
   if (v == null) return NaN;
   const cleaned = String(v).replace(/[^0-9.\-]/g, "");
@@ -66,34 +69,47 @@ const fmtMoney0 = (n) =>
 const fmtPct = (n) => (Number.isFinite(n) ? n : 0).toFixed(1) + "%";
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
-// Parse a "YYYY-MM-DD" string without going through Date() timezone shifts.
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"]/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+/* dates — parsed by hand so "YYYY-MM-DD" never shifts across timezones */
+
+function dateParts(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || "").trim());
+  return m ? { y: +m[1], mo: +m[2], d: +m[3] } : null;
+}
+function dayNum(s) {
+  const p = dateParts(s);
+  return p ? Date.UTC(p.y, p.mo - 1, p.d) / 86400000 : NaN;
+}
+function dayToIso(n) {
+  return new Date(n * 86400000).toISOString().slice(0, 10);
+}
+function weekdayOf(dateStr) {
+  const p = dateParts(dateStr);
+  return p ? new Date(Date.UTC(p.y, p.mo - 1, p.d)).getUTCDay() : 0;
+}
 function fmtDateShort(dateStr) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateStr || "").trim());
-  if (!m) return dateStr || "";
-  const mon = MONTHS[parseInt(m[2], 10) - 1] || m[2];
-  return `${mon} ${parseInt(m[3], 10)}`;
+  const p = dateParts(dateStr);
+  if (!p) return dateStr || "";
+  return `${MONTHS[p.mo - 1] || p.mo} ${p.d}`;
 }
 
-// read a design token off :root so charts match light/dark
+// read a design token off :root so charts match the active theme
 function token(name) {
-  return getComputedStyle(document.body).getPropertyValue(name).trim();
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-// inline SVG icon set — stroke-based, 24x24 viewBox, replaces emoji glyphs
-// (emoji render inconsistently across platforms and can't be themed/sized).
+/* inline SVG icon set — stroke-based, themed, consistent across platforms */
 const ICONS = {
   grocery: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.3"/><circle cx="18" cy="21" r="1.3"/><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/></svg>',
   meal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v7a2 2 0 0 0 4 0V2"/><path d="M8 9v13"/><path d="M17 2c-1.7 0-3 2.2-3 5s1.3 5 3 5v10"/></svg>',
   outside: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.2 11.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8L4 8Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
   waste: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/></svg>',
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
-  fun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14l-6.5 8.5v6l3 1.5h-7l3-1.5v-6z"/></svg>',
+  fun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M7 3h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4"/></svg>',
 };
-
-function esc(s) {
-  return String(s ?? "").replace(/[&<>"]/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-}
 
 /* ---- data loading -------------------------------------------------- */
 
@@ -121,54 +137,76 @@ function computeStats(data) {
 
   // --- purchases / trips ---
   const totalSpent = purchases.reduce((s, r) => s + n0(r.total_price), 0);
-
   const tripIds = new Set(purchases.map((r) => (r.trip_id || "").trim()).filter(Boolean));
   const tripDates = new Set(purchases.map((r) => (r.date || "").trim()).filter(Boolean));
   const totalTrips = tripIds.size || tripDates.size;
   const avgSpendPerTrip = totalTrips ? totalSpent / totalTrips : 0;
 
-  // --- outside food ---
+  // --- outside food / fun ---
   const outsideFoodTotal = outsideFood.reduce((s, r) => s + n0(r.cost), 0);
   const hasOutsideFood = outsideFood.length > 0;
   const foodTotal = totalSpent + outsideFoodTotal;
   const outsideFoodPct = foodTotal > 0 ? (outsideFoodTotal / foodTotal) * 100 : 0;
-
-  // --- fun (bars, rides, nights out — non-food discretionary spend) ---
   const funTotal = fun.reduce((s, r) => s + n0(r.cost), 0);
   const hasFun = fun.length > 0;
-
-  // --- all-time spend across every tracked dollar: groceries + eating out + fun ---
   const allSpendTotal = totalSpent + outsideFoodTotal + funTotal;
-  const hasAnySpend = totalSpent > 0 || outsideFoodTotal > 0 || funTotal > 0;
+  const hasAnySpend = allSpendTotal > 0;
 
-  // daily spend, groceries vs outside food vs fun
-  const groceriesByDate = new Map();
-  for (const r of purchases) {
-    const d = (r.date || "").trim();
-    if (!d) continue;
-    groceriesByDate.set(d, (groceriesByDate.get(d) || 0) + n0(r.total_price));
+  // --- spend by date (groceries / outside / fun), gap-filled ---
+  const byDate = new Map(); // dayNum -> {g,o,f}
+  const bump = (dateStr, key, val) => {
+    const d = dayNum(dateStr);
+    if (!Number.isFinite(d)) return;
+    if (!byDate.has(d)) byDate.set(d, { g: 0, o: 0, f: 0 });
+    byDate.get(d)[key] += val;
+  };
+  for (const r of purchases) bump(r.date, "g", n0(r.total_price));
+  for (const r of outsideFood) bump(r.date, "o", n0(r.cost));
+  for (const r of fun) bump(r.date, "f", n0(r.cost));
+
+  const spendDays = [...byDate.keys()].sort((a, b) => a - b);
+  const firstDay = spendDays[0];
+  const lastDay = spendDays[spendDays.length - 1];
+
+  // every calendar day from first to last — zero-filled so gaps are honest
+  const dailySpend = [];
+  if (spendDays.length) {
+    for (let d = firstDay; d <= lastDay; d++) {
+      const v = byDate.get(d) || { g: 0, o: 0, f: 0 };
+      dailySpend.push({ day: d, date: dayToIso(d), groceries: v.g, outside: v.o, fun: v.f, total: v.g + v.o + v.f });
+    }
   }
-  const outsideByDate = new Map();
-  for (const r of outsideFood) {
-    const d = (r.date || "").trim();
-    if (!d) continue;
-    outsideByDate.set(d, (outsideByDate.get(d) || 0) + n0(r.cost));
+  let running = 0;
+  const cumulativeSpend = dailySpend.map((d) => { running += d.total; return { ...d, running }; });
+
+  // --- week over week (7-day windows anchored on the latest data day) ---
+  let weekSpend = 0, prevWeekSpend = 0, weekDelta = null;
+  if (spendDays.length) {
+    for (const d of spendDays) {
+      const v = byDate.get(d);
+      const t = v.g + v.o + v.f;
+      if (d > lastDay - 7) weekSpend += t;
+      else if (d > lastDay - 14) prevWeekSpend += t;
+    }
+    if (prevWeekSpend > 0) weekDelta = ((weekSpend - prevWeekSpend) / prevWeekSpend) * 100;
   }
-  const funByDate = new Map();
-  for (const r of fun) {
-    const d = (r.date || "").trim();
-    if (!d) continue;
-    funByDate.set(d, (funByDate.get(d) || 0) + n0(r.cost));
+
+  // --- weekday pattern: average spend per day-of-week across the range ---
+  const dowTotals = new Array(7).fill(0);
+  const dowCounts = new Array(7).fill(0);
+  for (const d of dailySpend) {
+    const wd = new Date(d.day * 86400000).getUTCDay();
+    dowTotals[wd] += d.total;
+    dowCounts[wd] += 1;
   }
-  const allSpendDates = new Set([...groceriesByDate.keys(), ...outsideByDate.keys(), ...funByDate.keys()]);
-  const dailySpend = [...allSpendDates].sort().map((date) => ({
-    date,
-    groceries: groceriesByDate.get(date) || 0,
-    outside: outsideByDate.get(date) || 0,
-    fun: funByDate.get(date) || 0,
+  // Monday-first ordering reads naturally for a week
+  const dowOrder = [1, 2, 3, 4, 5, 6, 0];
+  const dowAvg = dowOrder.map((wd) => ({
+    label: DOW_SHORT[wd],
+    avg: dowCounts[wd] ? dowTotals[wd] / dowCounts[wd] : 0,
   }));
 
-  // top items by cost
+  // --- items / stores / categories ---
   const costByItem = new Map();
   for (const r of purchases) {
     const item = (r.item || "").trim();
@@ -180,7 +218,6 @@ function computeStats(data) {
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
 
-  // top stores by grocery spend — `store` is tracked per purchase but wasn't aggregated anywhere
   const costByStore = new Map();
   for (const r of purchases) {
     const store = (r.store || "").trim();
@@ -192,24 +229,51 @@ function computeStats(data) {
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
 
-  // spending by category (part-to-whole) — keyword-classified from item name
   const costByCategory = new Map();
   for (const r of purchases) {
     const item = (r.item || "").trim();
     if (!item) continue;
-    const cat = categorize(item);
-    costByCategory.set(cat, (costByCategory.get(cat) || 0) + n0(r.total_price));
+    const c = categorize(item);
+    costByCategory.set(c, (costByCategory.get(c) || 0) + n0(r.total_price));
   }
-  const spendByCategory = [...costByCategory.entries()]
-    .map(([category, total]) => ({ category, total, pct: totalSpent > 0 ? (total / totalSpent) * 100 : 0 }))
-    .sort((a, b) => b.total - a.total);
+  // fixed slot order — keeps stack adjacency identical to the validated palette order
+  const spendByCategory = CATEGORY_SLOTS
+    .filter((s) => costByCategory.has(s.name))
+    .map((s) => ({
+      category: s.name, token: s.token,
+      total: costByCategory.get(s.name),
+      pct: totalSpent > 0 ? (costByCategory.get(s.name) / totalSpent) * 100 : 0,
+    }));
 
-  // cumulative all-time spend (groceries + outside food + fun), running total by date
-  let running = 0;
-  const cumulativeSpend = [...allSpendDates].sort().map((date) => {
-    running += (groceriesByDate.get(date) || 0) + (outsideByDate.get(date) || 0) + (funByDate.get(date) || 0);
-    return { date, total: running };
-  });
+  // --- price watch: same item + unit, unit price changed between trips ---
+  const priceGroups = new Map();
+  for (const r of purchases) {
+    const item = (r.item || "").trim();
+    const unit = (r.unit || "").trim().toLowerCase();
+    const uc = num(r.unit_cost);
+    const d = dayNum(r.date);
+    if (!item || !Number.isFinite(uc) || uc <= 0 || !Number.isFinite(d)) continue;
+    const key = item.toLowerCase() + "|" + unit;
+    if (!priceGroups.has(key)) priceGroups.set(key, { item, unit: (r.unit || "").trim(), buys: [] });
+    priceGroups.get(key).buys.push({ d, uc });
+  }
+  const priceWatch = [];
+  for (const g of priceGroups.values()) {
+    if (g.buys.length < 2) continue;
+    g.buys.sort((a, b) => a.d - b.d);
+    const first = g.buys[0], last = g.buys[g.buys.length - 1];
+    if (first.d === last.d) continue;
+    const changePct = ((last.uc - first.uc) / first.uc) * 100;
+    if (Math.abs(changePct) < 0.5) continue; // stable prices aren't news
+    priceWatch.push({
+      item: g.item, unit: g.unit,
+      firstCost: first.uc, lastCost: last.uc,
+      firstDate: dayToIso(first.d), lastDate: dayToIso(last.d),
+      changePct,
+    });
+  }
+  priceWatch.sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+  const priceWatchTop = priceWatch.slice(0, 8);
 
   // --- meals ---
   const totalMeals = meals.length;
@@ -217,7 +281,7 @@ function computeStats(data) {
   const avgCostPerMeal = mealCosts.length
     ? mealCosts.reduce((s, x) => s + x, 0) / mealCosts.length : 0;
 
-  const byType = new Map(); // type -> {sum,count}
+  const byType = new Map();
   for (const r of meals) {
     let t = (r.meal_type || "").trim().toLowerCase();
     if (t === "snacks") t = "snack";
@@ -231,56 +295,124 @@ function computeStats(data) {
   const avgByMealType = MEAL_ORDER
     .filter((t) => byType.has(t))
     .map((t) => ({ type: t, avg: byType.get(t).sum / byType.get(t).count }));
-  // include any non-standard types after the known ones
   for (const [t, v] of byType) {
     if (!MEAL_ORDER.includes(t)) avgByMealType.push({ type: t, avg: v.sum / v.count });
   }
 
-  const mealsPerTrip = totalTrips ? totalMeals / totalTrips : 0;
-
-  // cost per meal: home-cooked vs. eating out
   const outsideAvgPerEvent = hasOutsideFood ? outsideFoodTotal / outsideFood.length : 0;
   const canCompareMealCost = avgCostPerMeal > 0 && hasOutsideFood;
   const eatingOutMultiplier = canCompareMealCost ? outsideAvgPerEvent / avgCostPerMeal : null;
-
-  // item breakdown: cost + how many meals it showed up in, combined
-  const mealsByItem = new Map(); // item -> Set(meal_id)
-  mealUsage.forEach((r, i) => {
-    const item = (r.item || "").trim();
-    if (!item) return;
-    const mealKey = (r.meal_id || "").trim() || `row${i}`;
-    if (!mealsByItem.has(item)) mealsByItem.set(item, new Set());
-    mealsByItem.get(item).add(mealKey);
-  });
-  const itemBreakdown = [...costByItem.entries()]
-    .map(([item, total]) => {
-      const count = mealsByItem.get(item)?.size || 0;
-      return { item, total, count, avgPerUse: count ? total / count : null };
-    })
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8);
-
-  // --- waste ---
-  const totalWaste = waste.reduce((s, r) => {
-    const v = num(r.waste_value);
-    return s + (Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost));
-  }, 0);
-  const wastePct = totalSpent > 0 ? (totalWaste / totalSpent) * 100 : 0;
-  const hasWaste = waste.length > 0;
-
-  // --- money saved by cooking at home vs. eating out ---
   const moneySaved = canCompareMealCost
     ? totalMeals * (outsideAvgPerEvent - avgCostPerMeal) : null;
 
-  // --- pace: avg $/day and a projected 30-day spend ---
-  const daysTrackedCount = new Set([
-    ...purchases.map((r) => (r.date || "").trim()),
-    ...outsideFood.map((r) => (r.date || "").trim()),
-  ].filter(Boolean)).size;
-  const avgSpendPerDay = daysTrackedCount ? foodTotal / daysTrackedCount : 0;
-  const projectedMonthlySpend = daysTrackedCount ? avgSpendPerDay * 30 : 0;
+  // meals per calendar day + daily avg cost, for the trend + heatmap
+  const mealsByDay = new Map(); // dayNum -> {count, sum, costs}
+  for (const r of meals) {
+    const d = dayNum(r.date);
+    if (!Number.isFinite(d)) continue;
+    if (!mealsByDay.has(d)) mealsByDay.set(d, { count: 0, sum: 0, n: 0 });
+    const cur = mealsByDay.get(d);
+    cur.count += 1;
+    const c = num(r.est_cost);
+    if (Number.isFinite(c)) { cur.sum += c; cur.n += 1; }
+  }
+  const mealDays = [...mealsByDay.keys()].sort((a, b) => a - b);
+  const mealTrend = [];
+  for (const d of mealDays) {
+    const cur = mealsByDay.get(d);
+    if (!cur.n) continue;
+    const dayAvg = cur.sum / cur.n;
+    // 7-day rolling mean of the daily averages (days with meals only)
+    let wSum = 0, wN = 0;
+    for (const d2 of mealDays) {
+      if (d2 > d) break;
+      if (d2 > d - 7) {
+        const c2 = mealsByDay.get(d2);
+        if (c2.n) { wSum += c2.sum / c2.n; wN += 1; }
+      }
+    }
+    mealTrend.push({ date: dayToIso(d), dayAvg, rolling: wN ? wSum / wN : dayAvg });
+  }
 
-  // --- inventory: active batches only, lowest fraction-remaining first ---
+  // --- all tracked dates (any file) ---
+  const allDayNums = new Set();
+  for (const rows of [purchases, meals, outsideFood, waste, fun]) {
+    for (const r of rows) {
+      const d = dayNum(r.date);
+      if (Number.isFinite(d)) allDayNums.add(d);
+    }
+  }
+  const trackFirst = Math.min(...(allDayNums.size ? allDayNums : [NaN]));
+  const trackLast = Math.max(...(allDayNums.size ? allDayNums : [NaN]));
+  const daysTrackedCount = allDayNums.size;
+  const dateRangeLabel = allDayNums.size
+    ? (trackFirst === trackLast
+        ? fmtDateShort(dayToIso(trackFirst))
+        : `${fmtDateShort(dayToIso(trackFirst))} – ${fmtDateShort(dayToIso(trackLast))}`)
+    : "";
+
+  const avgSpendPerDay = daysTrackedCount ? foodTotal / daysTrackedCount : 0;
+  const projectedMonthlySpend = avgSpendPerDay * 30;
+
+  // --- cooking streak: consecutive days with ≥1 home-cooked meal,
+  //     counted back from the latest tracked day (grace of 1 day) ---
+  let cookStreak = 0;
+  if (mealDays.length && Number.isFinite(trackLast)) {
+    const mealDaySet = new Set(mealDays);
+    let d = mealDaySet.has(trackLast) ? trackLast : trackLast - 1;
+    while (mealDaySet.has(d)) { cookStreak += 1; d -= 1; }
+  }
+
+  // --- share of food events eaten at home ---
+  const homeSharePct = (totalMeals + outsideFood.length) > 0
+    ? (totalMeals / (totalMeals + outsideFood.length)) * 100 : null;
+
+  // --- heatmap: meals per day across the full tracked range ---
+  const heatmap = [];
+  if (mealDays.length && Number.isFinite(trackFirst)) {
+    for (let d = trackFirst; d <= trackLast; d++) {
+      heatmap.push({ day: d, date: dayToIso(d), count: mealsByDay.get(d)?.count || 0 });
+    }
+  }
+
+  // --- most-used ingredients (distinct meals each item appeared in) ---
+  const mealsByItem = new Map();
+  mealUsage.forEach((r, i) => {
+    const item = (r.item || "").trim();
+    if (!item) return;
+    const key = (r.meal_id || "").trim() || `row${i}`;
+    if (!mealsByItem.has(item)) mealsByItem.set(item, new Set());
+    mealsByItem.get(item).add(key);
+  });
+  const topIngredients = [...mealsByItem.entries()]
+    .map(([item, set]) => ({ item, count: set.size }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  // --- waste ---
+  const wasteValue = (r) => {
+    const v = num(r.waste_value);
+    return Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost);
+  };
+  const totalWaste = waste.reduce((s, r) => s + wasteValue(r), 0);
+  const wastePct = totalSpent > 0 ? (totalWaste / totalSpent) * 100 : 0;
+  const hasWaste = waste.length > 0;
+  const wasteEvents = waste.map((r) => ({
+    date: (r.date || "").trim(), item: (r.item || "").trim(),
+    value: wasteValue(r), qty: (r.qty_wasted || "").trim(), unit: (r.unit || "").trim(),
+  })).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const wasteByItem = new Map();
+  for (const r of waste) {
+    const item = (r.item || "").trim();
+    if (!item) continue;
+    wasteByItem.set(item, (wasteByItem.get(item) || 0) + wasteValue(r));
+  }
+  const topWastedItems = [...wasteByItem.entries()]
+    .map(([item, total]) => ({ item, total }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5);
+
+  // --- inventory: active batches, lowest fraction-remaining first ---
   const activeInventoryAll = inventory
     .filter((r) => ["OPEN", "FUZZY"].includes(String(r.status || "").trim().toUpperCase()))
     .map((r) => {
@@ -288,48 +420,41 @@ function computeStats(data) {
       const remaining = num(r.qty_remaining);
       const pct = Number.isFinite(purchased) && purchased > 0 && Number.isFinite(remaining)
         ? (remaining / purchased) * 100 : null;
-      // Fuzzy estimates can drift at/below 0 — that's just an overshot portion
+      // Fuzzy estimates can drift at/below 0 — that's an overshot portion
       // estimate, not a real negative quantity, so clamp what we display.
-      const pctClamped = pct == null ? null : Math.max(0, pct);
-      return { ...r, pctRemaining: pctClamped };
+      const pctClamped = pct == null ? null : Math.max(0, Math.min(100, pct));
+      const ageDays = Number.isFinite(trackLast) && Number.isFinite(dayNum(r.date_purchased))
+        ? trackLast - dayNum(r.date_purchased) : null;
+      const remainValue = Math.max(0, n0(r.qty_remaining)) * n0(r.unit_cost);
+      return { ...r, pctRemaining: pctClamped, ageDays, remainValue, category: categorize(r.item) };
     })
     .sort((a, b) => {
       const pa = a.pctRemaining == null ? 101 : a.pctRemaining;
       const pb = b.pctRemaining == null ? 101 : b.pctRemaining;
       return pa - pb;
     });
-  const INVENTORY_LIMIT = 12;
-  const activeInventory = activeInventoryAll.slice(0, INVENTORY_LIMIT);
-  const activeInventoryMoreCount = Math.max(0, activeInventoryAll.length - INVENTORY_LIMIT);
   const lowStockCount = activeInventoryAll.filter((r) => r.pctRemaining != null && r.pctRemaining <= 20).length;
+  const pantryValue = activeInventoryAll.reduce((s, r) => s + r.remainValue, 0);
 
-  // top wasted items — where spoilage/waste dollars actually go
-  const wasteByItem = new Map();
-  for (const r of waste) {
-    const item = (r.item || "").trim();
-    if (!item) continue;
-    const v = num(r.waste_value);
-    const val = Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost);
-    wasteByItem.set(item, (wasteByItem.get(item) || 0) + val);
+  // fresh-category batches open 10+ days with plenty left — spoilage risk
+  const agingBatches = activeInventoryAll
+    .filter((r) => ["Produce", "Dairy & Eggs", "Protein"].includes(r.category))
+    .filter((r) => r.ageDays != null && r.ageDays >= 10 && (r.pctRemaining == null || r.pctRemaining >= 40))
+    .sort((a, b) => b.ageDays - a.ageDays)
+    .slice(0, 6);
+
+  // --- fun analysis ---
+  const funByDay = new Map();
+  for (const r of fun) {
+    const d = dayNum(r.date);
+    if (!Number.isFinite(d)) continue;
+    funByDay.set(d, (funByDay.get(d) || 0) + n0(r.cost));
   }
-  const topWastedItems = [...wasteByItem.entries()]
-    .map(([item, total]) => ({ item, total }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 5);
-
-  // --- days tracked ---
-  const allDates = new Set([
-    ...purchases.map((r) => (r.date || "").trim()),
-    ...meals.map((r) => (r.date || "").trim()),
-    ...outsideFood.map((r) => (r.date || "").trim()),
-    ...waste.map((r) => (r.date || "").trim()),
-  ].filter(Boolean));
-  const sortedDates = [...allDates].sort();
-  const dateRangeLabel = sortedDates.length
-    ? (sortedDates[0] === sortedDates[sortedDates.length - 1]
-        ? fmtDateShort(sortedDates[0])
-        : `${fmtDateShort(sortedDates[0])} – ${fmtDateShort(sortedDates[sortedDates.length - 1])}`)
-    : "";
+  let biggestFunNight = null;
+  for (const [d, total] of funByDay) {
+    if (!biggestFunNight || total > biggestFunNight.total) biggestFunNight = { date: dayToIso(d), total };
+  }
+  const funAvgPerEvent = hasFun ? funTotal / fun.length : 0;
 
   // --- unified activity feed ---
   const activity = [];
@@ -343,49 +468,38 @@ function computeStats(data) {
     const first = rows[0];
     const total = rows.reduce((s, r) => s + n0(r.total_price), 0);
     activity.push({
-      date: (first.date || "").trim(),
-      type: "grocery",
+      date: (first.date || "").trim(), type: "grocery",
       title: `${first.store || "Grocery"} trip — ${rows.length} item${rows.length === 1 ? "" : "s"}`,
-      amount: total,
-      sortKey: trip,
+      amount: total, sortKey: trip,
     });
   }
   for (const r of meals) {
     const c = num(r.est_cost);
     activity.push({
-      date: (r.date || "").trim(),
-      type: "meal",
+      date: (r.date || "").trim(), type: "meal",
       title: `${cap((r.meal_type || "").trim().toLowerCase())} — ${r.description || ""}`,
-      amount: Number.isFinite(c) ? c : null,
-      sortKey: r.meal_id || "",
+      amount: Number.isFinite(c) ? c : null, sortKey: r.meal_id || "",
     });
   }
   for (const r of outsideFood) {
     activity.push({
-      date: (r.date || "").trim(),
-      type: "outside",
+      date: (r.date || "").trim(), type: "outside",
       title: r.description || "Outside food",
-      amount: n0(r.cost),
-      sortKey: `${r.date}-${r.description}`,
+      amount: n0(r.cost), sortKey: `${r.date}-${r.description}`,
     });
   }
   for (const r of waste) {
-    const v = num(r.waste_value);
     activity.push({
-      date: (r.date || "").trim(),
-      type: "waste",
+      date: (r.date || "").trim(), type: "waste",
       title: `Wasted ${r.item || "item"}`,
-      amount: -(Number.isFinite(v) ? v : n0(r.qty_wasted) * n0(r.unit_cost)),
-      sortKey: r.batch_id || "",
+      amount: -wasteValue(r), sortKey: r.batch_id || "",
     });
   }
   for (const r of fun) {
     activity.push({
-      date: (r.date || "").trim(),
-      type: "fun",
+      date: (r.date || "").trim(), type: "fun",
       title: r.description || "Fun",
-      amount: n0(r.cost),
-      sortKey: `${r.date}-${r.description}`,
+      amount: n0(r.cost), sortKey: `${r.date}-${r.description}`,
     });
   }
   activity.sort((a, b) => {
@@ -394,99 +508,122 @@ function computeStats(data) {
     return String(b.sortKey).localeCompare(String(a.sortKey));
   });
 
+  // recent meals for the meal log table
+  const recentMeals = [...meals]
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.meal_id).localeCompare(String(a.meal_id)))
+    .slice(0, 12);
+
   return {
-    totalSpent, totalTrips, avgSpendPerTrip, dailySpend, cumulativeSpend, topItemsByCost,
-    spendByCategory, topStoresByCost,
-    totalMeals, avgCostPerMeal, avgByMealType, mealsPerTrip, itemBreakdown,
-    totalWaste, wastePct, hasWaste,
-    outsideFoodTotal, hasOutsideFood, foodTotal, outsideFoodPct,
-    funTotal, hasFun, funEventsCount: fun.length,
+    totalSpent, totalTrips, avgSpendPerTrip,
+    outsideFoodTotal, hasOutsideFood, foodTotal, outsideFoodPct, outsideCount: outsideFood.length,
+    funTotal, hasFun, funEventsCount: fun.length, funAvgPerEvent, biggestFunNight,
     allSpendTotal, hasAnySpend,
+    dailySpend, cumulativeSpend, weekSpend, prevWeekSpend, weekDelta, dowAvg,
+    topItemsByCost, topStoresByCost, spendByCategory, priceWatch: priceWatchTop,
+    totalMeals, avgCostPerMeal, avgByMealType, mealTrend, recentMeals,
     outsideAvgPerEvent, canCompareMealCost, eatingOutMultiplier, moneySaved,
-    avgSpendPerDay, projectedMonthlySpend, daysTrackedCount,
-    activeInventory, activeInventoryMoreCount, lowStockCount, dateRangeLabel,
-    topWastedItems, activity: activity.slice(0, 25),
+    cookStreak, homeSharePct, heatmap, topIngredients,
+    totalWaste, wastePct, hasWaste, wasteEvents, topWastedItems,
+    activeInventory: activeInventoryAll, lowStockCount, pantryValue, agingBatches,
+    avgSpendPerDay, projectedMonthlySpend, daysTrackedCount, dateRangeLabel,
+    activity,
     hasPurchases: purchases.length > 0,
     hasMeals: meals.length > 0,
   };
 }
 
-/* ---- KPI rendering ------------------------------------------------- */
+/* ---- animation primitives ------------------------------------------ */
 
-function renderKpis(s) {
-  const set = (id, txt) => { document.getElementById(id).textContent = txt; };
-
-  set("kpi-grocery-spend", s.hasPurchases ? fmtMoney0(s.totalSpent) : "—");
-  set("kpi-grocery-spend-sub", s.hasPurchases ? `${fmtMoney(s.avgSpendPerTrip)} avg / trip` : "");
-
-  set("kpi-outside-food", s.hasOutsideFood ? fmtMoney0(s.outsideFoodTotal) : "—");
-  set("kpi-outside-food-sub", s.hasOutsideFood ? `${fmtPct(s.outsideFoodPct)} of food $` : "");
-
-  set("kpi-fun-spend", s.hasFun ? fmtMoney0(s.funTotal) : "—");
-  set("kpi-fun-spend-sub", s.hasFun ? `${s.funEventsCount} event${s.funEventsCount === 1 ? "" : "s"}` : "");
-
-  set("kpi-all-spend", s.hasAnySpend ? fmtMoney0(s.allSpendTotal) : "—");
-  set("kpi-all-spend-sub", s.hasAnySpend
-    ? `${fmtMoney0(s.totalSpent)} groceries + ${fmtMoney0(s.outsideFoodTotal)} eating out + ${fmtMoney0(s.funTotal)} fun`
-    : "");
-
-  set("kpi-avg-day", s.daysTrackedCount ? fmtMoney(s.avgSpendPerDay) : "—");
-  set("kpi-avg-day-sub", s.daysTrackedCount ? `≈${fmtMoney0(s.projectedMonthlySpend)} / 30 days` : "");
-
-  set("kpi-waste-pct", s.hasPurchases ? fmtPct(s.wastePct) : "—");
-  const wasteSub = document.getElementById("kpi-waste-sub");
-  wasteSub.textContent = s.hasWaste ? `${fmtMoney(s.totalWaste)} wasted` : (s.hasPurchases ? "no waste logged" : "");
-  wasteSub.classList.toggle("tile__sub--good", s.hasPurchases && !s.hasWaste);
-
-  const lowStockTile = document.getElementById("tile-lowstock");
-  if (s.lowStockCount > 0) {
-    lowStockTile.hidden = false;
-    set("kpi-lowstock", String(s.lowStockCount));
-  } else {
-    lowStockTile.hidden = true;
+// animate a number counting up; instant under prefers-reduced-motion
+function countUp(el, target, fmt, dur = 800) {
+  if (!el) return;
+  if (REDUCED || !Number.isFinite(target) || target === 0) {
+    el.textContent = fmt(target || 0);
+    return;
   }
-
-  set("kpi-trips", s.totalTrips ? String(s.totalTrips) : "—");
-  set("kpi-trips-sub", s.totalTrips && s.totalMeals
-    ? `${s.mealsPerTrip.toFixed(1)} meals / trip` : "");
-
-  set("kpi-meals", s.totalMeals ? String(s.totalMeals) : "—");
-  set("kpi-meals-sub", s.dateRangeLabel || "");
+  const t0 = performance.now();
+  const tick = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const e = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    el.textContent = fmt(target * e);
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
-/* ---- cost-per-meal comparison callout ------------------------------ */
-
-function renderCompareCard(s) {
-  const set = (id, txt) => { document.getElementById(id).textContent = txt; };
-  set("compare-home", s.totalMeals ? fmtMoney(s.avgCostPerMeal) : "—");
-  set("compare-home-sub", s.totalMeals ? `avg across ${s.totalMeals} meal${s.totalMeals === 1 ? "" : "s"}` : "");
-  set("compare-outside", s.hasOutsideFood ? fmtMoney(s.outsideAvgPerEvent) : "—");
-  set("compare-outside-sub", s.hasOutsideFood ? "avg per event" : "");
-
-  const savedWrap = document.getElementById("compare-saved-wrap");
-  if (s.canCompareMealCost && s.moneySaved != null && s.moneySaved > 0) {
-    savedWrap.hidden = false;
-    set("compare-saved", fmtMoney0(s.moneySaved));
-  } else {
-    savedWrap.hidden = true;
-  }
-
-  const delta = document.getElementById("compare-delta");
-  if (s.canCompareMealCost) {
-    const mult = s.eatingOutMultiplier;
-    delta.innerHTML = mult >= 1
-      ? `Eating out costs <strong>${mult.toFixed(1)}×</strong> more per meal than cooking at home.`
-      : `Eating out actually costs <strong>${(1 / mult).toFixed(1)}× less</strong> per meal than cooking at home right now.`;
-  } else {
-    delta.textContent = "Log a home-cooked meal and an outside food event to see the comparison.";
-  }
+// staggered card entrance on a view's first render (30–80ms per Emil's playbook)
+function revealCards(viewEl) {
+  const cards = viewEl.querySelectorAll("[data-reveal]");
+  cards.forEach((c, i) => {
+    if (c.hidden) return;
+    c.style.animationDelay = Math.min(i * 45, 400) + "ms";
+    c.classList.add("reveal");
+  });
 }
 
-/* ---- charts -------------------------------------------------------- */
+/* ---- chart theme layer --------------------------------------------- */
 
-const charts = {}; // keep refs so we can destroy before re-render (theme swap)
+const charts = {}; // id -> Chart, so we can destroy on theme/range change
 
-// draw a value label at each bar tip / cap; measures so text never clips
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+function destroyAllCharts() {
+  Object.keys(charts).forEach(destroyChart);
+}
+
+const BAR_MAX = 22; // thin marks, per the dataviz spec
+
+function chartAnim() {
+  if (REDUCED) return false;
+  return {
+    duration: 550,
+    easing: "easeOutQuart",
+    delay: (ctx) => (ctx.type === "data" && ctx.mode === "default"
+      ? Math.min((ctx.dataIndex || 0) * 26, 320) : 0),
+  };
+}
+
+function baseScales({ x = {}, y = {} } = {}) {
+  const grid = token("--gridline");
+  const baseline = token("--baseline");
+  const muted = token("--text-3");
+  const mk = (over) => ({
+    grid: { color: grid, drawTicks: false, ...(over.grid || {}) },
+    border: { color: baseline, display: over.border?.display ?? true },
+    ticks: { color: muted, padding: 6, ...(over.ticks || {}) },
+    ...over,
+  });
+  return { x: mk(x), y: mk(y) };
+}
+
+function tooltipStyle() {
+  return {
+    backgroundColor: token("--surface-3"),
+    borderColor: token("--border-strong"),
+    borderWidth: 1,
+    titleColor: "#f7f8f8",
+    bodyColor: "#a2a7b0",
+    titleFont: { weight: 600 },
+    padding: 10, cornerRadius: 10,
+    boxWidth: 8, boxHeight: 8, usePointStyle: true, boxPadding: 4,
+  };
+}
+
+function legendStyle() {
+  return {
+    display: true,
+    position: "bottom",
+    labels: {
+      color: token("--text-2"),
+      usePointStyle: true, pointStyle: "circle",
+      boxWidth: 7, boxHeight: 7, padding: 14,
+      font: { size: 12 },
+    },
+  };
+}
+
+// value label at each bar tip; measures so text never clips
 const valueLabelPlugin = {
   id: "valueLabels",
   afterDatasetsDraw(chart, _args, opts) {
@@ -494,10 +631,9 @@ const valueLabelPlugin = {
     const { ctx, chartArea } = chart;
     const horizontal = chart.options.indexAxis === "y";
     ctx.save();
-    ctx.font = "600 12px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    ctx.font = "600 11px Inter, system-ui, sans-serif";
     ctx.textBaseline = "middle";
-    const ink = token("--text-primary");
-
+    const ink = token("--text-1");
     chart.getDatasetMeta(0).data.forEach((bar, i) => {
       const raw = chart.data.datasets[0].data[i];
       const label = opts.formatter(raw);
@@ -519,226 +655,7 @@ const valueLabelPlugin = {
   },
 };
 
-function baseScales({ x = {}, y = {} } = {}) {
-  const grid = token("--gridline");
-  const baseline = token("--baseline");
-  const muted = token("--text-muted");
-  const mk = (over) => ({
-    grid: { color: grid, drawTicks: false, ...(over.grid || {}) },
-    border: { color: baseline, display: over.border?.display ?? true },
-    ticks: { color: muted, padding: 6, ...(over.ticks || {}) },
-    ...over,
-  });
-  return { x: mk(x), y: mk(y) };
-}
-
-function tooltipStyle() {
-  return {
-    backgroundColor: token("--text-primary"),
-    titleColor: token("--surface-1"),
-    bodyColor: token("--surface-1"),
-    padding: 10, cornerRadius: 8, displayColors: false,
-  };
-}
-
-function legendStyle() {
-  return {
-    display: true,
-    position: "bottom",
-    labels: {
-      color: token("--text-secondary"),
-      boxWidth: 10, boxHeight: 10, padding: 14,
-      font: { size: 12 },
-    },
-  };
-}
-
-function toggleChart(canvasId, emptyId, hasData) {
-  const canvas = document.getElementById(canvasId);
-  const empty = document.getElementById(emptyId);
-  canvas.style.display = hasData ? "" : "none";
-  empty.hidden = hasData;
-  return hasData;
-}
-
-function renderDailySpendChart(s) {
-  if (!toggleChart("chart-dailyspend", "empty-dailyspend", s.dailySpend.length > 0)) return;
-  const c1 = token("--series-1");
-  const c2 = token("--series-2");
-  const c3 = token("--series-5");
-  charts.dailyspend = new Chart(document.getElementById("chart-dailyspend"), {
-    type: "bar",
-    data: {
-      labels: s.dailySpend.map((d) => fmtDateShort(d.date)),
-      datasets: [
-        {
-          label: "Groceries",
-          data: s.dailySpend.map((d) => d.groceries),
-          backgroundColor: c1,
-          borderRadius: 4, maxBarThickness: 40, stack: "spend",
-        },
-        {
-          label: "Outside food",
-          data: s.dailySpend.map((d) => d.outside),
-          backgroundColor: c2,
-          borderRadius: 4, maxBarThickness: 40, stack: "spend",
-        },
-        {
-          label: "Fun",
-          data: s.dailySpend.map((d) => d.fun),
-          backgroundColor: c3,
-          borderRadius: 4, maxBarThickness: 40, stack: "spend",
-        },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: legendStyle(),
-        tooltip: {
-          ...tooltipStyle(),
-          callbacks: { label: (i) => `${i.dataset.label}: ${fmtMoney(i.parsed.y)}` },
-        },
-      },
-      scales: baseScales({
-        x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } },
-        y: { stacked: true, beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-      }),
-    },
-  });
-}
-
-function renderMealTypeChart(s) {
-  if (!toggleChart("chart-mealtype", "empty-mealtype", s.avgByMealType.length > 0)) return;
-  const c1 = token("--series-1");
-  charts.mealtype = new Chart(document.getElementById("chart-mealtype"), {
-    type: "bar",
-    data: {
-      labels: s.avgByMealType.map((d) => cap(d.type)),
-      datasets: [{
-        data: s.avgByMealType.map((d) => d.avg),
-        backgroundColor: c1, // nominal categories → one hue for all bars
-        borderRadius: 4, borderSkipped: "bottom",
-        maxBarThickness: 48,
-      }],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 22 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.y) } },
-        valueLabels: { formatter: fmtMoney },
-      },
-      scales: baseScales({
-        x: { grid: { display: false } },
-        y: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-      }),
-    },
-    plugins: [valueLabelPlugin],
-  });
-}
-
-function renderTopItemsChart(s) {
-  if (!toggleChart("chart-topitems", "empty-topitems", s.topItemsByCost.length > 0)) return;
-  const c1 = token("--series-1");
-  charts.topitems = new Chart(document.getElementById("chart-topitems"), {
-    type: "bar",
-    data: {
-      labels: s.topItemsByCost.map((d) => d.item),
-      datasets: [{
-        data: s.topItemsByCost.map((d) => d.total),
-        backgroundColor: c1,
-        borderRadius: 4, borderSkipped: "start",
-        maxBarThickness: 24,
-      }],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { right: 56 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.x) } },
-        valueLabels: { formatter: fmtMoney },
-      },
-      scales: baseScales({
-        x: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-        y: { grid: { display: false } },
-      }),
-    },
-    plugins: [valueLabelPlugin],
-  });
-}
-
-function renderStoresChart(s) {
-  if (!toggleChart("chart-stores", "empty-stores", s.topStoresByCost.length > 0)) return;
-  const c1 = token("--series-1");
-  charts.stores = new Chart(document.getElementById("chart-stores"), {
-    type: "bar",
-    data: {
-      labels: s.topStoresByCost.map((d) => d.store),
-      datasets: [{
-        data: s.topStoresByCost.map((d) => d.total),
-        backgroundColor: c1,
-        borderRadius: 4, borderSkipped: "start",
-        maxBarThickness: 24,
-      }],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { right: 56 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.x) } },
-        valueLabels: { formatter: fmtMoney },
-      },
-      scales: baseScales({
-        x: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-        y: { grid: { display: false } },
-      }),
-    },
-    plugins: [valueLabelPlugin],
-  });
-}
-
-function renderSplitFoodChart(s) {
-  // groceries vs. outside food, side by side on one value axis
-  if (!toggleChart("chart-splitfood", "empty-splitfood", s.hasPurchases || s.hasOutsideFood)) return;
-  const c1 = token("--series-1");
-  const c2 = token("--series-2");
-  charts.splitfood = new Chart(document.getElementById("chart-splitfood"), {
-    type: "bar",
-    data: {
-      labels: ["Groceries", "Outside food"],
-      datasets: [{
-        data: [s.totalSpent, s.outsideFoodTotal],
-        backgroundColor: [c1, c2],
-        borderRadius: 4, borderSkipped: "start",
-        maxBarThickness: 24,
-      }],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { right: 64 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.x) } },
-        valueLabels: { formatter: fmtMoney0 },
-      },
-      scales: baseScales({
-        x: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-        y: { grid: { display: false } },
-      }),
-    },
-    plugins: [valueLabelPlugin],
-  });
-}
-
-// draw a value label at the last point of a single-series line — "value at the end"
+// value label at the last point of a single-series line
 const endLabelPlugin = {
   id: "endLabel",
   afterDatasetsDraw(chart, _args, opts) {
@@ -747,12 +664,13 @@ const endLabelPlugin = {
     if (!data.length) return;
     const meta = chart.getDatasetMeta(0);
     const lastPoint = meta.data[meta.data.length - 1];
+    if (!lastPoint) return;
     const label = opts.formatter(data[data.length - 1]);
     const { ctx, chartArea } = chart;
     ctx.save();
-    ctx.font = "600 12px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    ctx.font = "600 11px Inter, system-ui, sans-serif";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = token("--text-primary");
+    ctx.fillStyle = token("--text-1");
     const w = ctx.measureText(label).width;
     const outside = lastPoint.x + 8 + w <= chartArea.right;
     ctx.textAlign = outside ? "left" : "right";
@@ -761,98 +679,15 @@ const endLabelPlugin = {
   },
 };
 
-function renderCumulativeChart(s) {
-  if (!toggleChart("chart-cumulative", "empty-cumulative", s.cumulativeSpend.length > 0)) return;
-  const c1 = token("--series-1");
-  const surface = token("--surface-1");
-  charts.cumulative = new Chart(document.getElementById("chart-cumulative"), {
-    type: "line",
-    data: {
-      labels: s.cumulativeSpend.map((d) => fmtDateShort(d.date)),
-      datasets: [{
-        data: s.cumulativeSpend.map((d) => d.total),
-        borderColor: c1,
-        backgroundColor: c1 + "1a", // ~10% opacity wash, per mark spec
-        fill: true,
-        borderWidth: 2, tension: 0,
-        pointRadius: (ctx) => (ctx.dataIndex === ctx.dataset.data.length - 1 ? 5 : 0),
-        pointHoverRadius: 6,
-        pointBackgroundColor: c1,
-        pointBorderColor: surface, pointBorderWidth: 2,
-        pointHitRadius: 24,
-      }],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      layout: { padding: { right: 56, top: 8 } },
-      plugins: {
-        legend: { display: false }, // single series — the title names it
-        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => fmtMoney(i.parsed.y) } },
-        endLabel: { formatter: fmtMoney },
-      },
-      scales: baseScales({
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } },
-        y: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-      }),
-    },
-    plugins: [endLabelPlugin],
-  });
+function toggleChart(canvasId, emptyId, hasData) {
+  const canvas = document.getElementById(canvasId);
+  const empty = document.getElementById(emptyId);
+  if (canvas) canvas.parentElement.style.display = hasData ? "" : "none";
+  if (empty) empty.hidden = hasData;
+  return hasData;
 }
 
-// Chart.js draws legends into the canvas at a fixed pixel size — with 5-6
-// long "Category — $XX (XX%)" labels that either clips or overlaps in a
-// short box. Real HTML text wraps naturally and stays crisp at any zoom.
-function renderCategoryLegend(s) {
-  const el = document.getElementById("legend-category");
-  if (!el) return;
-  el.hidden = s.spendByCategory.length === 0;
-  el.innerHTML = s.spendByCategory.map((c) => {
-    const color = token(CATEGORY_COLOR_SLOTS[c.category] || "--series-6");
-    return `<li class="legend-list__item">
-      <span class="key" style="background:${color}"></span>
-      <span class="legend-list__name">${esc(c.category)}</span>
-      <span class="legend-list__value">${fmtMoney0(c.total)} · ${c.pct.toFixed(0)}%</span>
-    </li>`;
-  }).join("");
-}
-
-function renderCategoryChart(s) {
-  renderCategoryLegend(s);
-  if (!toggleChart("chart-category", "empty-category", s.spendByCategory.length > 0)) return;
-  const surface = token("--surface-1");
-  const datasets = s.spendByCategory.map((c) => ({
-    label: c.category,
-    data: [c.total],
-    backgroundColor: token(CATEGORY_COLOR_SLOTS[c.category] || "--series-6"),
-    borderColor: surface, borderWidth: 2, // surface-color border = the "gap" between segments
-    borderRadius: 4,
-    maxBarThickness: 24,
-    stack: "category",
-    _pct: c.pct, _total: c.total,
-  }));
-  charts.category = new Chart(document.getElementById("chart-category"), {
-    type: "bar",
-    data: { labels: [""], datasets },
-    options: {
-      indexAxis: "y",
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }, // HTML legend below the chart replaces this
-        tooltip: {
-          ...tooltipStyle(),
-          callbacks: { label: (i) => `${i.dataset.label}: ${fmtMoney(i.dataset._total)} (${i.dataset._pct.toFixed(0)}%)` },
-        },
-      },
-      scales: baseScales({
-        x: { stacked: true, beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
-        y: { stacked: true, display: false, grid: { display: false } },
-      }),
-    },
-  });
-}
-
-/* ---- tables -------------------------------------------------------- */
+/* ---- shared table builder ------------------------------------------ */
 
 function buildTable(containerId, columns, rows, emptyMsg) {
   const el = document.getElementById(containerId);
@@ -873,80 +708,765 @@ function buildTable(containerId, columns, rows, emptyMsg) {
 
 function statusPill(status) {
   const s = (status || "").trim();
-  const cls = s.toLowerCase();
-  return s ? `<span class="pill pill--${esc(cls)}">${esc(s)}</span>` : "";
+  return s ? `<span class="pill pill--${esc(s.toLowerCase())}">${esc(s)}</span>` : "";
 }
 
 function levelBar(pct) {
   if (pct == null) return "";
   const clamped = Math.max(0, Math.min(100, pct));
-  const low = clamped <= 20 ? " bar-fill--low" : "";
-  return `<div class="bar-track"><div class="bar-fill${low}" style="width:${clamped}%"></div></div>`;
+  const cls = clamped <= 20 ? " bar-fill--low" : clamped <= 40 ? " bar-fill--warn" : "";
+  return `<div class="bar-track"><span class="bar-fill${cls}" style="width:${clamped}%"></span></div>`;
 }
 
-function renderTables(data, stats) {
-  // item breakdown — cost + how often it's used, combined
-  buildTable("table-itembreakdown",
-    [
-      { key: "item", label: "Item" },
-      { label: "Total cost", num: true, render: (r) => fmtMoney(r.total) },
-      { label: "Times used", num: true, render: (r) => String(r.count) },
-      { label: "Avg / use", num: true,
-        render: (r) => r.avgPerUse != null ? fmtMoney(r.avgPerUse) : "—" },
-    ],
-    stats.itemBreakdown,
-    "Log a receipt and a meal to see item cost breakdown here.");
+function activityItemHtml(a, withDate) {
+  const amountCls = a.amount != null && a.amount < 0 ? " activity-amount--neg" : "";
+  const amountTxt = a.amount == null ? "—" : (a.amount < 0 ? "-" : "") + fmtMoney(Math.abs(a.amount));
+  return `<div class="activity-item">
+    <span class="activity-icon activity-icon--${a.type}" aria-hidden="true">${ICONS[a.type] || ""}</span>
+    <div class="activity-main">
+      <span class="activity-title">${esc(a.title)}</span>
+      ${withDate ? `<span class="activity-date">${esc(fmtDateShort(a.date))}</span>` : ""}
+    </div>
+    <span class="activity-amount${amountCls}">${amountTxt}</span>
+  </div>`;
+}
 
-  // inventory — active batches only, lowest remaining first
-  buildTable("table-inventory",
-    [
-      { key: "item", label: "Item" },
-      { label: "Level", render: (r) => levelBar(r.pctRemaining) },
-      { label: "Remaining", num: true,
-        render: (r) => {
-          const q = num(r.qty_remaining);
-          const qTxt = Number.isFinite(q) && q < 0 ? "~0" : esc(r.qty_remaining ?? "");
-          return `${qTxt} ${esc(r.unit ?? "")}`.trim();
-        } },
-      { label: "Status", render: (r) => statusPill(r.status) },
-    ],
-    stats.activeInventory,
-    "No open inventory — log your first receipt.");
-  if (stats.activeInventory.length && stats.activeInventoryMoreCount > 0) {
-    document.getElementById("table-inventory").insertAdjacentHTML("beforeend",
-      `<p class="table-more">+${stats.activeInventoryMoreCount} more open batch${stats.activeInventoryMoreCount === 1 ? "" : "es"} — see <code>inventory.csv</code></p>`);
+/* =====================================================================
+   VIEW RENDERERS
+   ===================================================================== */
+
+let CACHE = null;   // parsed CSV rows
+let STATS = null;   // computed stats
+let spendingRange = "all"; // "7" | "14" | "all"
+let activityFilter = "all";
+
+const setText = (id, txt) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+};
+
+/* ---- overview ------------------------------------------------------- */
+
+function renderHeroSparkline(s) {
+  const el = document.getElementById("hero-spark");
+  if (!el) return;
+  const days = s.dailySpend.slice(-14);
+  setText("hero-spark-label", days.length >= 2 ? "daily spend · last 14 days" : "");
+  if (days.length < 2) { el.innerHTML = ""; return; }
+  const w = 260, h = 76, pad = 4;
+  const vals = days.map((d) => d.total);
+  const max = Math.max(...vals, 0.01);
+  const stepX = (w - pad * 2) / (vals.length - 1);
+  const pts = vals.map((v, i) => [
+    pad + i * stepX,
+    h - pad - (v / max) * (h - pad * 2),
+  ]);
+  const line = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const [lastX, lastY] = pts[pts.length - 1];
+  const area = `${pad},${h - pad} ${line} ${lastX.toFixed(1)},${h - pad}`;
+  el.innerHTML =
+    `<polyline class="spark-area" points="${area}"></polyline>` +
+    `<polyline class="spark-line" points="${line}"></polyline>` +
+    `<circle class="spark-dot" cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="3.4"></circle>`;
+  if (!REDUCED) {
+    const lineEl = el.querySelector(".spark-line");
+    try {
+      const len = Math.ceil(lineEl.getTotalLength());
+      lineEl.style.strokeDasharray = String(len);
+      el.parentElement.style.setProperty("--spark-len", String(len));
+      el.parentElement.classList.add("spark-draw");
+    } catch (_e) { /* getTotalLength can throw pre-layout; skip the draw-in */ }
+  }
+}
+
+function renderOverview() {
+  const s = STATS;
+
+  // hero
+  countUp(document.getElementById("hero-value"), s.allSpendTotal, fmtMoney0, 900);
+  setText("hero-sub", s.hasAnySpend
+    ? `${fmtMoney0(s.totalSpent)} groceries · ${fmtMoney0(s.outsideFoodTotal)} eating out · ${fmtMoney0(s.funTotal)} fun — since ${s.dateRangeLabel.split("–")[0].trim()}`
+    : "Log your first receipt to start tracking.");
+  const deltaChip = document.getElementById("hero-delta");
+  if (s.weekDelta != null && Math.abs(s.weekDelta) >= 0.5) {
+    deltaChip.hidden = false;
+    deltaChip.classList.toggle("is-up", s.weekDelta > 0);
+    deltaChip.classList.toggle("is-down", s.weekDelta < 0);
+    setText("hero-delta-text", `${Math.abs(s.weekDelta).toFixed(0)}% vs prior week`);
+  } else {
+    deltaChip.hidden = true;
+  }
+  renderHeroSparkline(s);
+
+  // KPI tiles
+  setText("kpi-groceries", s.hasPurchases ? fmtMoney0(s.totalSpent) : "—");
+  setText("kpi-groceries-sub", s.hasPurchases
+    ? `${s.totalTrips} trips · ${fmtMoney(s.avgSpendPerTrip)} avg` : "");
+
+  setText("kpi-outside", s.hasOutsideFood ? fmtMoney0(s.outsideFoodTotal) : "—");
+  setText("kpi-outside-sub", s.hasOutsideFood
+    ? `${fmtPct(s.outsideFoodPct)} of food $ · ${s.outsideCount} events` : "");
+
+  setText("kpi-fun", s.hasFun ? fmtMoney0(s.funTotal) : "—");
+  setText("kpi-fun-sub", s.hasFun ? `${s.funEventsCount} events` : "");
+
+  setText("kpi-avgday", s.daysTrackedCount ? fmtMoney(s.avgSpendPerDay) : "—");
+  setText("kpi-avgday-sub", s.daysTrackedCount ? `≈${fmtMoney0(s.projectedMonthlySpend)} / 30 days on food` : "");
+
+  setText("kpi-waste", s.hasPurchases ? fmtPct(s.wastePct) : "—");
+  const wasteSub = document.getElementById("kpi-waste-sub");
+  wasteSub.textContent = s.hasWaste ? `${fmtMoney(s.totalWaste)} wasted` : (s.hasPurchases ? "no waste logged" : "");
+  wasteSub.classList.toggle("tile__sub--good", s.hasPurchases && !s.hasWaste);
+
+  setText("kpi-streak", s.cookStreak ? String(s.cookStreak) : "—");
+  setText("kpi-streak-sub", s.cookStreak ? `day${s.cookStreak === 1 ? "" : "s"} cooking at home` : "");
+
+  setText("kpi-pantry", s.activeInventory.length ? fmtMoney0(s.pantryValue) : "—");
+  setText("kpi-pantry-sub", s.activeInventory.length
+    ? `across ${s.activeInventory.length} open batches` : "");
+
+  const lowTile = document.getElementById("tile-lowstock");
+  lowTile.hidden = !(s.lowStockCount > 0);
+  if (s.lowStockCount > 0) setText("kpi-lowstock", String(s.lowStockCount));
+
+  // duel: home vs out
+  const homeVal = s.totalMeals ? s.avgCostPerMeal : 0;
+  const outVal = s.hasOutsideFood ? s.outsideAvgPerEvent : 0;
+  const maxVal = Math.max(homeVal, outVal, 0.01);
+  setText("duel-home-val", s.totalMeals ? fmtMoney(homeVal) : "—");
+  setText("duel-out-val", s.hasOutsideFood ? fmtMoney(outVal) : "—");
+  requestAnimationFrame(() => {
+    document.getElementById("duel-home-bar").style.width = (homeVal / maxVal) * 100 + "%";
+    document.getElementById("duel-out-bar").style.width = (outVal / maxVal) * 100 + "%";
+  });
+  const note = document.getElementById("duel-note");
+  if (s.canCompareMealCost) {
+    const mult = s.eatingOutMultiplier;
+    note.innerHTML = mult >= 1
+      ? `Eating out costs <strong>${mult.toFixed(1)}×</strong> more per meal than cooking at home.`
+      : `Eating out currently costs <strong>${(1 / mult).toFixed(1)}× less</strong> per meal than cooking.`;
+  } else {
+    note.textContent = "Log a home-cooked meal and an outside food event to see the comparison.";
+  }
+  const saved = document.getElementById("duel-saved");
+  if (s.canCompareMealCost && s.moneySaved > 0) {
+    saved.hidden = false;
+    saved.textContent = `≈${fmtMoney0(s.moneySaved)} saved by cooking ${s.totalMeals} meals`;
+  } else {
+    saved.hidden = true;
   }
 
-  // most wasted items — where spoilage dollars go
-  buildTable("table-wasted",
+  // recent activity preview
+  const el = document.getElementById("ov-activity");
+  if (!s.activity.length) {
+    el.innerHTML = `<p class="empty">Log a receipt, meal, or night out to see activity here.</p>`;
+  } else {
+    el.innerHTML = s.activity.slice(0, 8).map((a) => activityItemHtml(a, true)).join("");
+  }
+}
+
+/* ---- spending ------------------------------------------------------- */
+
+function sliceRange(arr) {
+  if (spendingRange === "all") return arr;
+  const n = parseInt(spendingRange, 10);
+  return arr.slice(-n);
+}
+
+function renderDailyChart() {
+  const s = STATS;
+  const data = sliceRange(s.dailySpend);
+  destroyChart("daily");
+  if (!toggleChart("chart-daily", "empty-daily", data.length > 0)) return;
+  const surface = token("--surface-1");
+  const mkBar = (label, key, colorToken) => ({
+    label,
+    data: data.map((d) => d[key]),
+    backgroundColor: token(colorToken),
+    borderColor: surface, borderWidth: 1.5, // 2px-ish surface gap between stacked segments
+    borderRadius: 3, borderSkipped: false,
+    maxBarThickness: BAR_MAX, stack: "spend",
+  });
+  charts.daily = new Chart(document.getElementById("chart-daily"), {
+    type: "bar",
+    data: {
+      labels: data.map((d) => fmtDateShort(d.date)),
+      datasets: [
+        mkBar("Groceries", "groceries", "--series-1"),
+        mkBar("Outside food", "outside", "--series-2"),
+        mkBar("Fun", "fun", "--series-3"),
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: chartAnim(),
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: legendStyle(),
+        tooltip: {
+          ...tooltipStyle(),
+          callbacks: { label: (i) => ` ${i.dataset.label}: ${fmtMoney(i.parsed.y)}` },
+        },
+      },
+      scales: baseScales({
+        x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+        y: { stacked: true, beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
+      }),
+    },
+  });
+}
+
+function renderCumulativeChart() {
+  const s = STATS;
+  const all = sliceRange(s.dailySpend);
+  destroyChart("cumulative");
+  if (!toggleChart("chart-cumulative", "empty-cumulative", all.length > 0)) return;
+  let run = 0;
+  const data = all.map((d) => { run += d.total; return { date: d.date, running: run }; });
+  const c1 = token("--series-1");
+  const surface = token("--surface-1");
+  charts.cumulative = new Chart(document.getElementById("chart-cumulative"), {
+    type: "line",
+    data: {
+      labels: data.map((d) => fmtDateShort(d.date)),
+      datasets: [{
+        data: data.map((d) => d.running),
+        borderColor: c1,
+        backgroundColor: c1 + "1a", // ~10% wash per the mark spec
+        fill: true,
+        borderWidth: 2,
+        cubicInterpolationMode: "monotone", tension: 0.35,
+        pointRadius: (ctx) => (ctx.dataIndex === ctx.dataset.data.length - 1 ? 4 : 0),
+        pointHoverRadius: 5,
+        pointBackgroundColor: c1,
+        pointBorderColor: surface, pointBorderWidth: 2,
+        pointHitRadius: 24,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: REDUCED ? false : { duration: 650, easing: "easeOutQuart" },
+      interaction: { mode: "index", intersect: false },
+      layout: { padding: { right: 56, top: 8 } },
+      plugins: {
+        legend: { display: false }, // single series — the title names it
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => ` ${fmtMoney(i.parsed.y)}` } },
+        endLabel: { formatter: fmtMoney0 },
+      },
+      scales: baseScales({
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } },
+        y: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
+      }),
+    },
+    plugins: [endLabelPlugin],
+  });
+}
+
+function renderDowChart() {
+  const s = STATS;
+  destroyChart("dow");
+  const hasData = s.dowAvg.some((d) => d.avg > 0);
+  if (!toggleChart("chart-dow", "empty-dow", hasData)) return;
+  charts.dow = new Chart(document.getElementById("chart-dow"), {
+    type: "bar",
+    data: {
+      labels: s.dowAvg.map((d) => d.label),
+      datasets: [{
+        data: s.dowAvg.map((d) => d.avg),
+        backgroundColor: token("--series-1"),
+        borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "bottom",
+        maxBarThickness: BAR_MAX,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: chartAnim(),
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => ` avg ${fmtMoney(i.parsed.y)}` } },
+        valueLabels: { formatter: fmtMoney0 },
+      },
+      scales: baseScales({
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
+      }),
+    },
+    plugins: [valueLabelPlugin],
+  });
+}
+
+function renderCategoryChart() {
+  const s = STATS;
+  destroyChart("category");
+  const legendEl = document.getElementById("legend-category");
+  legendEl.hidden = s.spendByCategory.length === 0;
+  legendEl.innerHTML = s.spendByCategory.map((c) => `<li class="legend-list__item">
+      <span class="key" style="background:${token(c.token)}"></span>
+      <span class="legend-list__name">${esc(c.category)}</span>
+      <span class="legend-list__value">${fmtMoney0(c.total)} · ${c.pct.toFixed(0)}%</span>
+    </li>`).join("");
+  if (!toggleChart("chart-category", "empty-category", s.spendByCategory.length > 0)) return;
+  const surface = token("--surface-1");
+  const datasets = s.spendByCategory.map((c) => ({
+    label: c.category,
+    data: [c.total],
+    backgroundColor: token(c.token),
+    borderColor: surface, borderWidth: 1.5, // surface gap between segments
+    borderRadius: 3, borderSkipped: false,
+    maxBarThickness: BAR_MAX,
+    stack: "category",
+    _pct: c.pct,
+  }));
+  charts.category = new Chart(document.getElementById("chart-category"), {
+    type: "bar",
+    data: { labels: [""], datasets },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false,
+      animation: chartAnim(),
+      plugins: {
+        legend: { display: false }, // HTML legend below carries identity
+        tooltip: {
+          ...tooltipStyle(),
+          callbacks: { label: (i) => ` ${i.dataset.label}: ${fmtMoney(i.parsed.x)} (${i.dataset._pct.toFixed(0)}%)` },
+        },
+      },
+      scales: baseScales({
+        x: { stacked: true, beginAtZero: true, ticks: { callback: (v) => fmtMoney0(v) } },
+        y: { stacked: true, display: false, grid: { display: false } },
+      }),
+    },
+  });
+}
+
+// keep long category labels readable at narrow widths — trailing ellipsis,
+// never a mid-word clip; tooltips still carry the full name
+function truncTick(v) {
+  const label = this.getLabelForValue(v);
+  const max = this.chart.width < 520 ? 16 : 24;
+  return label.length > max ? label.slice(0, max - 1) + "…" : label;
+}
+
+function hBarChart(id, canvasId, emptyId, rows, labelKey, valueKey, fmt) {
+  destroyChart(id);
+  if (!toggleChart(canvasId, emptyId, rows.length > 0)) return;
+  charts[id] = new Chart(document.getElementById(canvasId), {
+    type: "bar",
+    data: {
+      labels: rows.map((r) => r[labelKey]),
+      datasets: [{
+        data: rows.map((r) => r[valueKey]),
+        backgroundColor: token("--series-1"),
+        borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: "left",
+        maxBarThickness: BAR_MAX,
+      }],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false,
+      animation: chartAnim(),
+      layout: { padding: { right: 56 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => ` ${fmt(i.parsed.x)}` } },
+        valueLabels: { formatter: fmt },
+      },
+      scales: baseScales({
+        x: { beginAtZero: true, ticks: { callback: (v) => (fmt === fmtMoney ? fmtMoney0(v) : v) } },
+        y: { grid: { display: false }, ticks: { callback: truncTick } },
+      }),
+    },
+    plugins: [valueLabelPlugin],
+  });
+}
+
+function renderPriceWatch() {
+  const s = STATS;
+  buildTable("table-pricewatch",
     [
       { key: "item", label: "Item" },
-      { label: "Wasted", num: true, render: (r) => fmtMoney(r.total) },
+      { label: "Then", num: true, render: (r) => `${fmtMoney(r.firstCost)}<span class="tile__sub">/${esc(r.unit || "unit")}</span>` },
+      { label: "Now", num: true, render: (r) => `${fmtMoney(r.lastCost)}<span class="tile__sub">/${esc(r.unit || "unit")}</span>` },
+      { label: "Change", num: true, render: (r) => {
+          const up = r.changePct > 0.5, down = r.changePct < -0.5;
+          const cls = up ? "delta--up" : down ? "delta--down" : "delta--flat";
+          const sign = up ? "+" : "";
+          return `<span class="delta ${cls}">${sign}${r.changePct.toFixed(0)}%</span>`;
+        } },
     ],
-    stats.topWastedItems,
-    "No waste logged.");
+    s.priceWatch,
+    "No unit-price changes between repeat purchases yet.");
+}
 
-  // unified activity feed
-  const el = document.getElementById("table-activity");
-  if (!stats.activity.length) {
-    el.innerHTML = `<p class="empty">Log a receipt, meal, or outside food event to see activity here.</p>`;
+function renderFun() {
+  const s = STATS;
+  const emptyEl = document.getElementById("empty-fun");
+  emptyEl.hidden = s.hasFun;
+  setText("fun-total", s.hasFun ? fmtMoney0(s.funTotal) : "—");
+  setText("fun-events", s.hasFun ? String(s.funEventsCount) : "—");
+  setText("fun-biggest", s.biggestFunNight ? fmtMoney0(s.biggestFunNight.total) : "—");
+  setText("fun-biggest-sub", s.biggestFunNight ? fmtDateShort(s.biggestFunNight.date) : "");
+  setText("fun-avg", s.hasFun ? fmtMoney(s.funAvgPerEvent) : "—");
+}
+
+function renderSpending() {
+  const s = STATS;
+  setText("spending-sub", s.dateRangeLabel
+    ? `${s.dateRangeLabel} · every tracked dollar`
+    : "Every tracked dollar — groceries, eating out, fun");
+  renderDailyChart();
+  renderCumulativeChart();
+  renderDowChart();
+  renderCategoryChart();
+  hBarChart("stores", "chart-stores", "empty-stores", s.topStoresByCost, "store", "total", fmtMoney);
+  hBarChart("topitems", "chart-topitems", "empty-topitems", s.topItemsByCost, "item", "total", fmtMoney);
+  renderPriceWatch();
+  renderFun();
+}
+
+/* ---- meals ---------------------------------------------------------- */
+
+function renderMealTrendChart() {
+  const s = STATS;
+  destroyChart("mealtrend");
+  if (!toggleChart("chart-mealtrend", "empty-mealtrend", s.mealTrend.length > 1)) return;
+  const gray = token("--text-3");
+  const c1 = token("--series-1");
+  const surface = token("--surface-1");
+  charts.mealtrend = new Chart(document.getElementById("chart-mealtrend"), {
+    type: "line",
+    data: {
+      labels: s.mealTrend.map((d) => fmtDateShort(d.date)),
+      datasets: [
+        {
+          label: "7-day average",
+          data: s.mealTrend.map((d) => d.rolling),
+          borderColor: c1, backgroundColor: c1,
+          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
+          pointHitRadius: 20,
+          cubicInterpolationMode: "monotone", tension: 0.35,
+        },
+        {
+          label: "Daily average",
+          data: s.mealTrend.map((d) => d.dayAvg),
+          borderColor: "transparent", backgroundColor: gray,
+          showLine: false,
+          pointRadius: 3, pointHoverRadius: 5, pointHitRadius: 20,
+          pointBorderColor: surface, pointBorderWidth: 1.5,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: REDUCED ? false : { duration: 650, easing: "easeOutQuart" },
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: legendStyle(),
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => ` ${i.dataset.label}: ${fmtMoney(i.parsed.y)}` } },
+      },
+      scales: baseScales({
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } },
+        y: { beginAtZero: true, ticks: { callback: (v) => fmtMoney(v) } },
+      }),
+    },
+  });
+}
+
+function renderMealTypeChart() {
+  const s = STATS;
+  destroyChart("mealtype");
+  if (!toggleChart("chart-mealtype", "empty-mealtype", s.avgByMealType.length > 0)) return;
+  charts.mealtype = new Chart(document.getElementById("chart-mealtype"), {
+    type: "bar",
+    data: {
+      labels: s.avgByMealType.map((d) => cap(d.type)),
+      datasets: [{
+        data: s.avgByMealType.map((d) => d.avg),
+        backgroundColor: token("--series-1"), // nominal categories → one hue
+        borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "bottom",
+        maxBarThickness: 30,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: chartAnim(),
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipStyle(), callbacks: { label: (i) => ` ${fmtMoney(i.parsed.y)}` } },
+        valueLabels: { formatter: fmtMoney },
+      },
+      scales: baseScales({
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, ticks: { stepSize: 1, callback: (v) => fmtMoney0(v) } },
+      }),
+    },
+    plugins: [valueLabelPlugin],
+  });
+}
+
+function renderHeatmap() {
+  const s = STATS;
+  const grid = document.getElementById("heatmap");
+  const legend = document.getElementById("heatmap-legend");
+  const empty = document.getElementById("empty-heatmap");
+  const has = s.heatmap.length > 0;
+  empty.hidden = has;
+  grid.style.display = has ? "" : "none";
+  legend.style.display = has ? "" : "none";
+  if (!has) { grid.innerHTML = ""; legend.innerHTML = ""; return; }
+
+  const level = (c) => (c <= 0 ? 0 : c === 1 ? 1 : c === 2 ? 2 : c === 3 ? 3 : 4);
+  const byDay = new Map(s.heatmap.map((d) => [d.day, d]));
+  const first = s.heatmap[0].day;
+  const last = s.heatmap[s.heatmap.length - 1].day;
+  // pad to full Sunday-started weeks
+  const firstDow = new Date(first * 86400000).getUTCDay();
+  const start = first - firstDow;
+  const weeks = Math.ceil((last - start + 1) / 7);
+
+  let html = "";
+  // left gutter: weekday labels (rows: month header + 7 days)
+  html += `<div class="heatmap__month"></div>`;
+  for (let r = 0; r < 7; r++) {
+    html += `<div class="heatmap__dow">${r === 1 ? "Mon" : r === 3 ? "Wed" : r === 5 ? "Fri" : ""}</div>`;
+  }
+  let lastMonth = -1;
+  let cellIdx = 0;
+  for (let w = 0; w < weeks; w++) {
+    const weekStart = start + w * 7;
+    const p = dateParts(dayToIso(weekStart <= last ? Math.max(weekStart, first) : last));
+    let monthLabel = "";
+    if (p && p.mo !== lastMonth) { monthLabel = MONTHS[p.mo - 1]; lastMonth = p.mo; }
+    html += `<div class="heatmap__month">${monthLabel}</div>`;
+    for (let r = 0; r < 7; r++) {
+      const d = weekStart + r;
+      const cell = byDay.get(d);
+      if (!cell) {
+        html += `<div class="heatmap__cell heatmap__cell--void"></div>`;
+      } else {
+        const lv = level(cell.count);
+        const delay = REDUCED ? "" : `style="animation-delay:${Math.min(cellIdx * 14, 500)}ms"`;
+        html += `<div class="heatmap__cell${lv ? ` heatmap__cell--l${lv}` : ""}" ${delay}
+          title="${esc(fmtDateShort(cell.date))} — ${cell.count} meal${cell.count === 1 ? "" : "s"}"></div>`;
+        cellIdx++;
+      }
+    }
+  }
+  grid.innerHTML = html;
+  legend.innerHTML = `<span>fewer</span>
+    <div class="heatmap__cell"></div>
+    <div class="heatmap__cell heatmap__cell--l1"></div>
+    <div class="heatmap__cell heatmap__cell--l2"></div>
+    <div class="heatmap__cell heatmap__cell--l3"></div>
+    <div class="heatmap__cell heatmap__cell--l4"></div>
+    <span>more</span>`;
+}
+
+function renderMeals() {
+  const s = STATS;
+  setText("meals-sub", s.hasMeals
+    ? `${s.dateRangeLabel} · tracked to the ingredient`
+    : "Home cooking, tracked to the ingredient");
+
+  countUp(document.getElementById("meals-count"), s.totalMeals, (v) => String(Math.round(v)), 600);
+  setText("meals-count-sub", s.dateRangeLabel);
+  setText("meals-avg", s.totalMeals ? fmtMoney(s.avgCostPerMeal) : "—");
+  setText("meals-share", s.homeSharePct != null ? s.homeSharePct.toFixed(0) + "%" : "—");
+  setText("meals-share-sub", s.homeSharePct != null
+    ? `${s.totalMeals} home · ${s.outsideCount} out` : "");
+  setText("meals-streak", s.cookStreak ? String(s.cookStreak) : "—");
+  setText("meals-streak-sub", s.cookStreak ? `consecutive day${s.cookStreak === 1 ? "" : "s"}` : "");
+
+  renderMealTrendChart();
+  renderMealTypeChart();
+  renderHeatmap();
+  hBarChart("ingredients", "chart-ingredients", "empty-ingredients",
+    STATS.topIngredients, "item", "count", (v) => Math.round(v) + "×");
+
+  buildTable("table-meals",
+    [
+      { label: "Date", render: (r) => `<span class="tile__sub cell-nowrap">${esc(fmtDateShort(r.date))}</span>` },
+      { label: "Type", render: (r) => esc(cap((r.meal_type || "").trim())) },
+      { key: "description", label: "Meal" },
+      { label: "Est.", num: true, render: (r) => {
+          const c = num(r.est_cost);
+          return Number.isFinite(c) ? fmtMoney(c) : "—";
+        } },
+    ],
+    s.recentMeals,
+    "Log your first meal to see it here.");
+}
+
+/* ---- kitchen -------------------------------------------------------- */
+
+function renderKitchen() {
+  const s = STATS;
+
+  setText("kit-open", s.activeInventory.length ? String(s.activeInventory.length) : "—");
+  setText("kit-open-sub", s.activeInventory.length
+    ? `${s.activeInventory.filter((r) => String(r.status).trim().toUpperCase() === "FUZZY").length} tracked as estimates` : "");
+  setText("kit-value", s.activeInventory.length ? fmtMoney0(s.pantryValue) : "—");
+  setText("kit-low", String(s.lowStockCount));
+  setText("kit-waste", s.hasWaste ? fmtMoney(s.totalWaste) : "$0");
+  setText("kit-waste-sub", s.hasPurchases ? `${fmtPct(s.wastePct)} of grocery spend` : "");
+
+  // pantry list — batches with real stock lead; near-empty fuzzy estimates are
+  // portion-tracking drift, not confirmed empties, so they fold into one line
+  const invEl = document.getElementById("inv-list");
+  if (!s.activeInventory.length) {
+    invEl.innerHTML = `<p class="empty">No open inventory — log your first receipt.</p>`;
+  } else {
+    const nearEmpty = s.activeInventory.filter((r) => r.pctRemaining != null && r.pctRemaining < 5);
+    const stocked = s.activeInventory.filter((r) => !(r.pctRemaining != null && r.pctRemaining < 5));
+    const LIMIT = 14;
+    const shown = stocked.slice(0, LIMIT);
+    const more = stocked.length - shown.length;
+    let html = shown.map((r) => {
+      const q = num(r.qty_remaining);
+      const qTxt = Number.isFinite(q) && q < 0 ? "~0" : esc(r.qty_remaining ?? "");
+      const age = r.ageDays != null ? `${r.ageDays}d old` : "";
+      const meta = [esc(r.store || ""), age].filter(Boolean).join(" · ");
+      return `<div class="inv-row">
+        <div class="inv-row__name">
+          <div class="inv-row__item">${esc(r.item)}</div>
+          <div class="inv-row__meta">${meta}</div>
+        </div>
+        ${levelBar(r.pctRemaining)}
+        <div class="inv-row__qty">${qTxt} ${esc(r.unit ?? "")}</div>
+        <div class="inv-row__pill">${statusPill(r.status)}</div>
+      </div>`;
+    }).join("");
+    if (more > 0) {
+      html += `<p class="table-more">+${more} more open batch${more === 1 ? "" : "es"} — see <code>inventory.csv</code></p>`;
+    }
+    if (nearEmpty.length) {
+      html += `<p class="table-more">≈ Empty by the estimates (unconfirmed): ${nearEmpty.map((r) => esc(r.item)).join(", ")}</p>`;
+    }
+    invEl.innerHTML = html || `<p class="empty">No open inventory — log your first receipt.</p>`;
+  }
+
+  // use soon
+  const agingEl = document.getElementById("aging-list");
+  if (!s.agingBatches.length) {
+    agingEl.innerHTML = `<p class="empty">Nothing fresh is sitting around. Nice.</p>`;
+  } else {
+    agingEl.innerHTML = s.agingBatches.map((r) => `<div class="inv-row" style="grid-template-columns: minmax(0,1.5fr) minmax(80px,1fr) 90px;">
+      <div class="inv-row__name">
+        <div class="inv-row__item">${esc(r.item)}</div>
+        <div class="inv-row__meta">opened ${esc(fmtDateShort(r.date_purchased))} · ${r.ageDays} days ago</div>
+      </div>
+      ${levelBar(r.pctRemaining)}
+      <div class="inv-row__qty">${fmtMoney(r.remainValue)} left</div>
+    </div>`).join("");
+  }
+
+  // waste log
+  const wasteEl = document.getElementById("waste-list");
+  if (!s.wasteEvents.length) {
+    wasteEl.innerHTML = `<p class="empty">No waste logged. Keep it that way.</p>`;
+  } else {
+    wasteEl.innerHTML = s.wasteEvents.map((w) => activityItemHtml({
+      type: "waste",
+      title: `${w.item}${w.qty ? ` — ${w.qty} ${w.unit}` : ""}`,
+      amount: -w.value,
+      date: w.date,
+    }, true)).join("");
+  }
+}
+
+/* ---- activity ------------------------------------------------------- */
+
+function renderActivity() {
+  const s = STATS;
+  const el = document.getElementById("activity-feed");
+  const rows = activityFilter === "all"
+    ? s.activity
+    : s.activity.filter((a) => a.type === activityFilter);
+  if (!rows.length) {
+    el.innerHTML = `<p class="empty">Nothing here yet.</p>`;
     return;
   }
-  el.innerHTML = `<div class="activity-list">${stats.activity.map((a) => {
-    const amountCls = a.amount != null && a.amount < 0 ? " activity-amount--neg" : "";
-    const amountTxt = a.amount == null ? "—" : (a.amount < 0 ? "-" : "") + fmtMoney(Math.abs(a.amount));
-    return `<div class="activity-item">
-      <span class="activity-icon-chip activity-icon-chip--${a.type}" aria-hidden="true">${ICONS[a.type] || ""}</span>
-      <div class="activity-main">
-        <span class="activity-title">${esc(a.title)}</span>
-        <span class="activity-date">${esc(fmtDateShort(a.date))}</span>
-      </div>
-      <span class="activity-amount${amountCls}">${amountTxt}</span>
-    </div>`;
-  }).join("")}</div>`;
+  const LIMIT = 120;
+  const shown = rows.slice(0, LIMIT);
+  let html = "";
+  let lastDate = null;
+  for (const a of shown) {
+    if (a.date !== lastDate) {
+      html += `<div class="feed-date">${esc(fmtDateShort(a.date))}</div>`;
+      lastDate = a.date;
+    }
+    html += activityItemHtml(a, false);
+  }
+  if (rows.length > LIMIT) {
+    html += `<p class="table-more">+${rows.length - LIMIT} older entries in the CSVs</p>`;
+  }
+  el.innerHTML = html;
 }
 
-/* ---- last updated -------------------------------------------------- */
+/* =====================================================================
+   ROUTER + ORCHESTRATION
+   ===================================================================== */
+
+const renderedViews = new Set();
+let activeView = null;
+
+const VIEW_RENDERERS = {
+  overview: renderOverview,
+  spending: renderSpending,
+  meals: renderMeals,
+  kitchen: renderKitchen,
+  activity: renderActivity,
+};
+
+function currentRoute() {
+  const name = location.hash.replace(/^#\/?/, "").trim();
+  return VIEW_ORDER.includes(name) ? name : "overview";
+}
+
+function activateView(name) {
+  if (name === activeView) return;
+  const prevIdx = VIEW_ORDER.indexOf(activeView);
+  const nextIdx = VIEW_ORDER.indexOf(name);
+
+  document.querySelectorAll(".view").forEach((v) => {
+    v.classList.remove("is-active", "view-in", "view-in-back");
+  });
+  const el = document.getElementById("view-" + name);
+  el.classList.add("is-active");
+  if (activeView !== null) {
+    // direction-aware entrance: forward slides from the right, back from the left
+    el.classList.add(prevIdx !== -1 && nextIdx < prevIdx ? "view-in-back" : "view-in");
+  }
+
+  document.querySelectorAll("[data-nav]").forEach((a) => {
+    const on = a.dataset.nav === name;
+    a.classList.toggle("is-active", on);
+    if (on) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+
+  activeView = name;
+  window.scrollTo(0, 0);
+
+  if (STATS && !renderedViews.has(name)) {
+    VIEW_RENDERERS[name]();
+    renderedViews.add(name);
+    revealCards(el);
+  }
+}
+
+function rerenderActive() {
+  destroyAllCharts();
+  renderedViews.clear();
+  if (STATS && activeView) {
+    VIEW_RENDERERS[activeView]();
+    renderedViews.add(activeView);
+  }
+}
+
+/* ---- last updated --------------------------------------------------- */
 
 function renderLastUpdated(loaded) {
   const stamps = Object.values(loaded)
@@ -956,56 +1476,37 @@ function renderLastUpdated(loaded) {
     .filter((d) => !isNaN(d));
   if (!stamps.length) return;
   const latest = new Date(Math.max(...stamps.map((d) => d.getTime())));
-  const el = document.getElementById("last-updated");
-  el.textContent = "Updated " + latest.toLocaleDateString(undefined,
+  const txt = "Updated " + latest.toLocaleDateString(undefined,
     { year: "numeric", month: "short", day: "numeric" });
-  el.hidden = false;
+  document.querySelectorAll("[data-updated]").forEach((el) => {
+    el.textContent = txt;
+    el.hidden = false;
+  });
 }
 
-/* ---- orchestration ------------------------------------------------- */
+/* ---- init ----------------------------------------------------------- */
 
-let CACHE = null; // parsed rows, so we can re-render on theme change
+function wireControls() {
+  // spending range segmented control
+  const seg = document.getElementById("range-seg");
+  seg.addEventListener("click", (e) => {
+    const btn = e.target.closest(".seg__btn");
+    if (!btn) return;
+    spendingRange = btn.dataset.range;
+    seg.querySelectorAll(".seg__btn").forEach((b) => b.classList.toggle("is-active", b === btn));
+    renderDailyChart();
+    renderCumulativeChart();
+  });
 
-// tiny trend line in the hero tile — last ~14 days of total food spend
-function renderHeroSparkline(s) {
-  const el = document.getElementById("kpi-spark");
-  if (!el) return;
-  const days = s.dailySpend.slice(-14).map((d) => d.groceries + d.outside);
-  if (days.length < 2) { el.innerHTML = ""; return; }
-  const w = 120, h = 36, pad = 3;
-  const max = Math.max(...days, 0.01);
-  const min = Math.min(0, ...days);
-  const range = (max - min) || 1;
-  const stepX = (w - pad * 2) / (days.length - 1);
-  const pts = days.map((v, i) => [
-    pad + i * stepX,
-    h - pad - ((v - min) / range) * (h - pad * 2),
-  ]);
-  const line = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
-  const [lastX, lastY] = pts[pts.length - 1];
-  const area = `${pad},${h - pad} ${line} ${lastX.toFixed(1)},${h - pad}`;
-  const color = token("--series-1");
-  el.innerHTML =
-    `<polyline points="${area}" fill="${color}" opacity="0.12" stroke="none"></polyline>` +
-    `<polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline>` +
-    `<circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.3" fill="${color}"></circle>`;
-}
-
-function renderAll() {
-  if (!CACHE) return;
-  const stats = computeStats(CACHE);
-  renderKpis(stats);
-  renderHeroSparkline(stats);
-  renderCompareCard(stats);
-  Object.values(charts).forEach((c) => c && c.destroy());
-  renderDailySpendChart(stats);
-  renderCumulativeChart(stats);
-  renderMealTypeChart(stats);
-  renderCategoryChart(stats);
-  renderSplitFoodChart(stats);
-  renderTopItemsChart(stats);
-  renderStoresChart(stats);
-  renderTables(CACHE, stats);
+  // activity filter chips
+  const filters = document.getElementById("activity-filters");
+  filters.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip--filter");
+    if (!chip) return;
+    activityFilter = chip.dataset.filter;
+    filters.querySelectorAll(".chip--filter").forEach((c) => c.classList.toggle("is-active", c === chip));
+    renderActivity();
+  });
 }
 
 async function init() {
@@ -1014,16 +1515,23 @@ async function init() {
   );
   const loaded = Object.fromEntries(entries);
   CACHE = Object.fromEntries(entries.map(([k, v]) => [k, v.rows]));
+  STATS = computeStats(CACHE);
 
-  Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
-  Chart.defaults.color = token("--text-secondary");
+  Chart.defaults.font.family = "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif";
+  Chart.defaults.font.size = 11.5;
+  Chart.defaults.color = token("--text-3");
 
   renderLastUpdated(loaded);
-  renderAll();
+  wireControls();
 
-  // re-render charts when the OS theme flips so tokens stay in sync
+  // initial route (renders the active view; other views render lazily on first visit)
+  activateView(currentRoute());
+  const initial = document.getElementById("view-" + activeView);
+  window.addEventListener("hashchange", () => activateView(currentRoute()));
+
+  // re-render when the OS theme flips so chart tokens stay in sync
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const onChange = () => { Chart.defaults.color = token("--text-secondary"); renderAll(); };
+  const onChange = () => { Chart.defaults.color = token("--text-3"); rerenderActive(); };
   if (mq.addEventListener) mq.addEventListener("change", onChange);
   else if (mq.addListener) mq.addListener(onChange);
 }
