@@ -54,19 +54,19 @@ M0052,2026-07-27,breakfast,"apple, peanut butter",1.03,
 M0053,2026-07-27,lunch,"3 eggs, bagel, spinach, cottage cheese",2.53,"eggs (B027) confirmed ran out - user bought more (B046, unused); cottage cheese (B006) reconciled to $0.30 share - user confirmed batch finished, total cost spread across all uses"
 M0054,2026-07-27,dinner,"tortilla, chicken, cheese, onions, red peppers, beans, rice",3.12,"chicken drawn from new batch B045 (Springer Mountain Farms Boneless Chicken Breast, today's Publix receipt T009) - resolves the gap left by B028 closing out on 2026-07-25; black beans (B041) reconciled to $0.37 share - batch confirmed finished 2026-07-29, total cost spread across all uses"
 M0055,2026-07-27,snack,"mandarin, icecream",1.32,
-M0056,2026-07-28,breakfast,"3 eggs, cottage cheese (first tub finished), beans, cheese",1.99,"cottage cheese switches to new batch B037 (24oz) - B006 confirmed finished 2026-07-28; eggs from B046 (Large Eggs) since B027 closed; beans assumed = black beans (B041), continuing established convention where unqualified 'beans' has meant black beans"
+M0056,2026-07-28,breakfast,"3 eggs, cottage cheese (first tub finished), beans, cheese",1.66,"cottage cheese switches to new batch B037 (24oz) - B006 confirmed finished 2026-07-28; eggs from B046 (Large Eggs) since B027 closed - batch corrected 2026-08-03 to 18ct (was mislogged as a dozen), unit_cost now $0.21; beans = black beans (B041), confirmed by user 2026-08-03 as the standing convention for unqualified 'beans'"
 M0057,2026-07-28,lunch,"apple, bagel, peanut butter, cream cheese (finished, the berry one), 2 mandarins",3.31,"cream cheese (B005, Whipped Cream Cheese) confirmed finished today - reconciled total $3.49 cost across all uses (M0009, M0021, M0033, M0042, M0046, M0057); Cava $12 dinner logged separately as outside food"
 M0058,2026-07-28,snack,"milk, cereal",1.31,
-M0059,2026-07-29,breakfast,"3 eggs, red peppers, cottage cheese, beans",2.07,"beans assumed = black beans (B041)"
+M0059,2026-07-29,breakfast,"3 eggs, red peppers, cottage cheese, beans",1.74,"beans = black beans (B041), confirmed by user 2026-08-03; eggs (B046) recosted at corrected $0.21/ct (18ct pack, not a dozen)"
 M0060,2026-07-29,lunch,"apple, mandarin",1.05,
 M0061,2026-07-29,dinner,"chicken, onion, red pepper, beans (1 can finished), chickpeas, rice",2.81,"black beans (B041) confirmed finished by user - reconciled total $1.31 cost across all uses (M0047, M0054, M0056, M0059, M0061); chickpeas is a new item, first use, drawn from B039"
 M0062,2026-07-29,snack,"ice cream, bagel, cream cheese (the new one)",2.13,"cream cheese drawn from new batch B048 (Publix) - first use since B005 closed out; $9 food logged separately as outside food"
-M0063,2026-07-30,breakfast,"3 eggs, cottage cheese",1.58,
+M0063,2026-07-30,breakfast,"3 eggs, cottage cheese",1.25,"eggs (B046) recosted at corrected $0.21/ct (18ct pack, not a dozen)"
 M0064,2026-07-30,lunch,"apple, 2 mandarins",1.44,
 M0065,2026-07-30,dinner,"chicken, pasta (new box), onions, red peppers, pasta sauce, garlic paste",3.61,"pasta drawn from new batch B050 (first use, replaces closed B017, user noted 'new box'); pasta sauce drawn from new batch B049 (first use, replaces closed B015)"
 M0066,2026-07-30,snack,"ice cream",0.93,"$6 food and Dominos $7 logged separately as outside food"
 M0067,2026-07-31,breakfast,"milk, cereal",1.31,
-M0068,2026-07-31,lunch,"3 eggs, cottage cheese, cheese, 2 mandarins",2.59,"eggs (B046) usage brings estimate to exactly 0 - flagged for confirmation"
+M0068,2026-07-31,lunch,"3 eggs, cottage cheese, cheese, 2 mandarins",2.26,"eggs (B046) recosted at corrected $0.21/ct (18ct pack, not a dozen) - prior 'exactly 0' flag resolved, batch was actually 18ct"
 M0069,2026-07-31,snack,"milk, cereal",1.31,"food truck $17 dinner and $7 food logged separately as outside food"
-M0070,2026-08-01,breakfast,"3 eggs, cottage cheese, onion, red pepper, chickpeas",2.46,"date assumed 2026-08-01 (Saturday) - user labeled both Friday and this day '7/31', treated as a typo since a day can't repeat; eggs (B046) usage now runs the estimate negative (-3) - flagging since eggs are an exact-count item, please confirm if more were bought or a prior count was off"
+M0070,2026-08-01,breakfast,"3 eggs, cottage cheese, onion, red pepper, chickpeas",2.13,"date assumed 2026-08-01 (Saturday) - user labeled both Friday and this day '7/31', treated as a typo since a day can't repeat; eggs (B046) recosted at corrected $0.21/ct (18ct pack, not a dozen) - prior negative-estimate flag resolved, 3ct remain"
 M0071,2026-08-01,dinner,"chicken, chickpeas, onions, green peppers, rice",2.62,"chicken (B045) usage brings estimate to exactly 0 - flagged for confirmation; ice cream $13 and 7-Eleven $10 logged separately as outside food; Sky $14 logged to fun.csv"

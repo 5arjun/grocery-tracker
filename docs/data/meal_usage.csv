@@ -254,13 +254,13 @@ M0065,B010,Garlic Blend,0.15,pkg,yes,garlic paste
 M0066,B022,Mint Choc Chip Ice Cream,0.15,tub,yes,
 M0067,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
 M0067,B023,Cereal,0.25,box,yes,
-M0068,B046,Large Eggs,3,ct,no,brings batch to exactly 0 - flagged for confirmation
+M0068,B046,Large Eggs,3,ct,no,
 M0068,B037,Cottage Cheese Lowfat,0.15,tub,yes,
 M0068,B034,Mexican Four Cheese Blend,0.1,bag,yes,
 M0068,B008,Mandarins,2,ct,yes,
 M0069,B031,Milk 2% Reduced Fat,0.15,bottle,yes,
 M0069,B023,Cereal,0.25,box,yes,
-M0070,B046,Large Eggs,3,ct,no,"brings estimate negative (-3) - flagged for confirmation, real discrepancy since eggs are exact-count"
+M0070,B046,Large Eggs,3,ct,no,
 M0070,B037,Cottage Cheese Lowfat,0.15,tub,yes,
 M0070,B033,Yellow Onion,0.1,ct,yes,
 M0070,B043,Red Bell Peppers,0.1,lb,yes,
