@@ -270,3 +270,27 @@ M0071,B039,Chickpeas,0.4,can,yes,
 M0071,B033,Yellow Onion,0.1,ct,yes,
 M0071,B043,Red Bell Peppers,0.1,lb,yes,green pepper = red bell peppers
 M0071,B020,Basmati Rice,0.15,bag,yes,
+M0072,B016,Red Delicious Apples,0.33,lb,yes,1 apple
+M0073,B008,Mandarins,1,ct,yes,
+M0074,B046,Large Eggs,2,ct,no,"last 2ct of the batch - user confirmed no more"
+M0074,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0074,B033,Yellow Onion,0.1,ct,yes,
+M0074,B043,Red Bell Peppers,0.1,lb,yes,
+M0075,B016,Red Delicious Apples,0.33,lb,yes,"1 apple - user confirmed 'no more', closing out batch"
+M0075,B008,Mandarins,2,ct,yes,
+M0076,B045,Boneless Chicken Breast,0.25,pkg,yes,"user confirmed 'finished' - last of batch, closing out"
+M0076,B050,Rigatoni Pasta,0.25,box,yes,
+M0076,B039,Chickpeas,0.4,can,yes,"user confirmed '1 can finished' - closing out, FIFO moves to B040"
+M0076,B033,Yellow Onion,0.1,ct,yes,
+M0076,B001,Pepper Trio,0.15,pkg,yes,frozen peppers = pepper trio
+M0076,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0076,B034,Mexican Four Cheese Blend,0.1,bag,yes,
+M0076,B010,Garlic Blend,0.15,pkg,yes,garlic paste
+M0077,B055,Large Eggs,3,ct,no,first use of this new batch - B046 closed out
+M0077,B033,Yellow Onion,0.1,ct,yes,
+M0077,B043,Red Bell Peppers,0.1,lb,yes,
+M0077,B037,Cottage Cheese Lowfat,0.15,tub,yes,
+M0077,B011,Burrito Tortillas,1,ct,no,
+M0078,B044,Apples Evercrisp,0.2,bag,yes,"1 apple - first use of this batch, FIFO moved here now that B016 is closed"
+M0078,B021,Natural Creamy Peanut Butter,0.1,jar,yes,
+M0078,B008,Mandarins,2,ct,yes,

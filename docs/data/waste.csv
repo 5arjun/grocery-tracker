@@ -1,2 +1,3 @@
 date,item,batch_id,qty_wasted,unit,unit_cost,waste_value,reason
 2026-07-24,Sliced Rotisserie Chicken,B002,0.5,pkg,9.09,4.55,"user reported ~50% of the package had expired and was thrown out; qty_wasted is an estimate (50% of original 1-pkg purchase) - FLAGGED: tracked fuzzy usage already had this batch at ~0 remaining before this event, so the real physical quantity may not match our estimate; please confirm actual amount if known"
+2026-08-03,Large Eggs,B046,1,ct,0.21,0.21,"user reported 1 egg wasted at 2026-08-03 breakfast (M0074); exact-count item - the batch's last 3ct = 2 eaten + 1 wasted, so this closes B046 out cleanly with no discrepancy"
